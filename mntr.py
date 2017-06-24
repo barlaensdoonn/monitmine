@@ -3,23 +3,47 @@
 # 6/22/17
 
 
-import requests
 import minor
+import requests
+from datetime import datetime
+
 
 # need to wrap miner request in try except because it throws a ConnectionError if it can't connect
 miner_url = minor.miner_url
-
 coins = ['eth', 'sia', 'zec']
 
-addresses = minor.addresses
+
+class Miner(object):
+    'interact with the miner api'
+
+    miner_url = minor.miner_url
+
+    def __init__(self):
+        self.stats = self._get_stats()
+        self.start_time = datetime.fromtimestamp(self._get_start_time())
+
+    def _get_stats(self):
+        try:
+            r = requests.get(miner_url)
+            return r.json()
+        except ConnectionError:
+            print('could not connect to the miner')
+
+    def _get_start_time(self):
+        return self.stats['result'][0]['start_time']
+
+    def get_time_up(self):
+        return datetime.now() - self.start_time
 
 
 class Coin(object):
     'basic functions to interact with nanopool api'
 
+    addresses = minor.addresses
+
     def __init__(self, coin):
         self.coin = coin
-        self.address = addresses[coin]
+        self.address = self.addresses[coin]
         self.balance = 0
         self.paid = 0
         self.total = 0
