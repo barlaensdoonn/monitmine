@@ -72,8 +72,8 @@ if __name__ == '__main__':
                 time.sleep(1)
 
                 print('time up: {}'.format(miner.time_up))
-                print('total sps: {}'.format(miner.sps))
-                print('average_sps: {} over {} polls'.format(miner.average_sps, miner.polls))
+                # print('total sps: {}'.format(miner.sps))
+                print('average_sps: {}'.format(miner.average_sps, miner.polls))
 
                 for key in miner.shares:
                     for gpu in miner.shares[key]:
