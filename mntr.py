@@ -8,11 +8,6 @@ import requests
 from datetime import datetime
 
 
-# need to wrap miner request in try except because it throws a ConnectionError if it can't connect
-miner_url = minor.miner_url
-coins = ['eth', 'sia', 'zec']
-
-
 class Miner(object):
     'interact with the miner api'
 
@@ -24,7 +19,7 @@ class Miner(object):
 
     def _get_stats(self):
         try:
-            r = requests.get(miner_url)
+            r = requests.get(self.miner_url)
             return r.json()
         except ConnectionError:
             print('could not connect to the miner')
@@ -111,6 +106,7 @@ class Coin(object):
 
 if __name__ == '__main__':
     stat_order = ['balance', 'payments', 'total', 'total_in_btc', 'total_in_usd', 'price']
+    coins = ['eth', 'sia', 'zec']
 
     for currency in coins:
         altcoin = Coin(currency)
@@ -122,3 +118,6 @@ if __name__ == '__main__':
             print('{}: {:.6f}'.format(key, altcoin.info[key]))
 
         print(' - - - - - - - - \n')
+
+    miner = Miner()
+    print(miner.get_time_up())
