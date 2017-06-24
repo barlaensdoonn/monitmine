@@ -47,8 +47,10 @@ class Miner(object):
         self.average_sps = int(self.sps / self.polls)
 
     def _get_shares(self):
+        'to properly average shares over time this calculation should be running when miner starts'
+
         for i in range(len(self.stats['result'])):
-            self.shares['total'][i] += self.stats['result'][i]['accepted_shares']
+            self.shares['total'][i] = self.stats['result'][i]['accepted_shares']
             self.shares['average'][i] = int(self.shares['total'][i] / self.polls)
 
     def poll(self):
