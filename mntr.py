@@ -74,19 +74,24 @@ class Coin(object):
             'balance': self.balance,
             'payments': self.paid,
             'total': self.total,
-            'total_in_btc': self.btc,
-            'total_in_usd': self.usd,
+            'total_btc': self.btc,
+            'total_usd': self.usd,
             'price': self.price_usd
         }
 
 
 if __name__ == '__main__':
-    stat_order = ['balance', 'payments', 'total', 'total_in_btc', 'total_in_usd', 'price']
+    stat_order = ['balance', 'payments', 'total', 'total_btc', 'total_usd', 'price']
     coins = ['eth', 'sia', 'zec']
+    total_usd = 0
+    total_btc = 0
 
     for currency in coins:
         altcoin = Coin(currency)
         altcoin.update()
+
+        total_usd += altcoin.info['total_usd']
+        total_btc += altcoin.info['total_btc']
 
         print(' - - - {} - - - '.format(currency.upper()))
 
@@ -94,3 +99,7 @@ if __name__ == '__main__':
             print('{}: {:.6f}'.format(key, altcoin.info[key]))
 
         print(' - - - - - - - - \n')
+
+    print(' - - - TOTAL - - - ')
+    print('total_usd: {:.6f}'.format(total_usd))
+    print('total_btc: {:.6f}'.format(total_btc))
