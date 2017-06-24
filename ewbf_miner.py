@@ -22,6 +22,10 @@ class Miner(object):
         self.average_sps = 0
         self.stats = self._get_stats()
         self.start_time = datetime.fromtimestamp(self._get_start_time())
+        self.shares = {
+            'total': {i: 0 for i in range(len(self.stats['result']))},
+            'average': {i: 0 for i in range(len(self.stats['result']))}
+        }
 
     def _get_stats(self):
         try:
@@ -40,15 +44,19 @@ class Miner(object):
         for gpu in self.stats['result']:
             self.sps += gpu['speed_sps']
 
-    def _average_sps(self):
         self.average_sps = int(self.sps / self.polls)
+
+    def _get_shares(self):
+        for i in range(len(self.stats['result'])):
+            self.shares['total'][i] += self.stats['result'][i]['accepted_shares']
+            self.shares['average'][i] = int(self.shares['total'][i] / self.polls)
 
     def poll(self):
         self.stats = self._get_stats()
         self.polls += 1
         self._get_time_up()
         self._get_sps()
-        self._average_sps()
+        self._get_shares()
 
 
 if __name__ == '__main__':
@@ -63,7 +71,13 @@ if __name__ == '__main__':
 
                 print('time up: {}'.format(miner.time_up))
                 print('total sps: {}'.format(miner.sps))
-                print('average_sps: {} over {} polls\n'.format(miner.average_sps, miner.polls))
+                print('average_sps: {} over {} polls'.format(miner.average_sps, miner.polls))
+
+                for key in miner.shares:
+                    for gpu in miner.shares[key]:
+                        print('{} shares for gpu{}: {}'.format(key, gpu, miner.shares[key][gpu]))
+
+                print('\n')
 
     except KeyboardInterrupt:
         print('\nexiting...')
