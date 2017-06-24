@@ -82,7 +82,7 @@ class Coin(object):
 
 if __name__ == '__main__':
     stat_order = ['balance', 'payments', 'total', 'total_btc', 'total_usd', 'price']
-    coins = ['eth', 'sia', 'zec']
+    coins = [key for key in minor.addresses.keys()]
     total_usd = 0
     total_btc = 0
 
@@ -103,3 +103,4 @@ if __name__ == '__main__':
     print(' - - - TOTAL - - - ')
     print('total_usd: {:.6f}'.format(total_usd))
     print('total_btc: {:.6f}'.format(total_btc))
+    print(' - - - - - - - - \n')
