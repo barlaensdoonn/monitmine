@@ -3,7 +3,7 @@
 # 6/22/17
 
 # temp, gpu_power_usage, speed_sps updated by api every 30 seconds
-# to properly average values this script should be running when miner starts
+# to properly average values this script should be launched right after miner starts and right after a % 30 seconds == 0
 
 import sys
 import time
@@ -18,6 +18,7 @@ class Miner(object):
     miner_url = minor.miner_url
     cumulative = ['gpu_power_usage', 'temperature', 'speed_sps']
     not_cumulative = ['accepted_shares', 'rejected_shares']
+    watts = 600
 
     def __init__(self):
         self.polls = 0
@@ -47,7 +48,8 @@ class Miner(object):
             'temperature': {'total': 0, 'average': 0},
             'speed_sps': {'total': 0, 'average': 0},
             'accepted_shares': {'total': 0, 'average': 0},
-            'rejected_shares': {'total': 0, 'average': 0}
+            'rejected_shares': {'total': 0, 'average': 0},
+            'kWhs': {'consumed': 0, 'cost': 0}
         }
 
     def _get_stats(self):
@@ -72,6 +74,10 @@ class Miner(object):
             up_time_mins = self.up_time.total_seconds() / 60
             self.gpu_stats[gpu]['shares_per_min'] = self.gpu_stats[gpu]['accepted_shares']['total'] / up_time_mins
 
+    def _get_kwhs_consumed(self):
+        self.session_stats['kWhs']['consumed'] = (self.watts / 1000) * (self.up_time.total_seconds() / 60 / 60)
+        self.session_stats['kWhs']['cost'] = self.session_stats['kWhs']['consumed'] * 0.13
+
     def _update_stats(self):
         self.stats = self._get_stats()
 
@@ -91,36 +97,44 @@ class Miner(object):
                 self.session_stats[stat]['total'] = current_stat
 
         for stat in self.session_stats:
-            self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
+            if stat in self.cumulative or stat in self.not_cumulative:
+                self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
+
+        self._get_kwhs_consumed()
 
     def _print_stats(self):
         print('- - - - - - - - - - - - - - - - - -')
         print('time up: {}'.format(self.up_time))
 
-        print('\n')
+        print()
 
         for stat in self.cumulative:
             for gpu in self.gpu_stats:
                 print('average {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
 
-        print('\n')
+        print()
 
         for stat in self.not_cumulative:
             for gpu in self.gpu_stats:
                 print('total {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['total']))
 
-        print('\n')
+        print()
+
+        for gpu in self.gpu_stats:
+            print('shares per min gpu{}: {}'.format(gpu, self.gpu_stats[gpu]['shares_per_min']))
+
+        print()
 
         for stat in self.session_stats:
             if stat in self.cumulative:
                 print('session average {}: {}'.format(stat, self.session_stats[stat]['average']))
             elif stat in self.not_cumulative:
                 print('session total {}: {}'.format(stat, self.session_stats[stat]['total']))
+            else:
+                for nested_stat in self.session_stats[stat]:
+                    print('session {} {}: {}'.format(stat, nested_stat, self.session_stats[stat][nested_stat]))
 
-        print('\n')
-
-        for gpu in self.gpu_stats:
-            print('shares per min gpu{}: {}'.format(gpu, self.gpu_stats[gpu]['shares_per_min']))
+        print()
 
         print('- - - - - - - - - - - - - - - - - -\n')
 
