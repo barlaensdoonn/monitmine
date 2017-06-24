@@ -68,8 +68,9 @@ class Miner(object):
     def _get_up_time(self):
         self.up_time = datetime.now() - self.gpu_stats[0]['start_time']
 
-    def _get_shares_per_min(self):
-        pass
+    def _get_shares_per_min(self, gpu):
+            up_time_mins = self.up_time.total_seconds() / 60
+            self.gpu_stats[gpu]['shares_per_min'] = self.gpu_stats[gpu]['accepted_shares']['total'] / up_time_mins
 
     def _update_stats(self):
         self.stats = self._get_stats()
@@ -81,6 +82,8 @@ class Miner(object):
                 self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
                 self.session_stats[stat]['total'] += current_stat
 
+            self._get_shares_per_min(i)
+
             for stat in self.not_cumulative:
                 current_stat = self.stats['result'][i][stat]
                 self.gpu_stats[i][stat]['total'] = current_stat
@@ -91,20 +94,20 @@ class Miner(object):
             self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
     def _print_stats(self):
-        print('- - - - - - - - - - - - - - - - - - - - - - -')
+        print('- - - - - - - - - - - - - - - - - -')
         print('time up: {}'.format(self.up_time))
 
         print('\n')
 
         for stat in self.cumulative:
             for gpu in self.gpu_stats:
-                print('average {} for gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
+                print('average {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
 
         print('\n')
 
         for stat in self.not_cumulative:
             for gpu in self.gpu_stats:
-                print('total {} for gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['total']))
+                print('total {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['total']))
 
         print('\n')
 
@@ -114,7 +117,12 @@ class Miner(object):
             elif stat in self.not_cumulative:
                 print('session total {}: {}'.format(stat, self.session_stats[stat]['total']))
 
-        print('- - - - - - - - - - - - - - - - - - - - - - -\n')
+        print('\n')
+
+        for gpu in self.gpu_stats:
+            print('shares per min gpu{}: {}'.format(gpu, self.gpu_stats[gpu]['shares_per_min']))
+
+        print('- - - - - - - - - - - - - - - - - -\n')
 
     def poll(self):
         self.polls += 1
