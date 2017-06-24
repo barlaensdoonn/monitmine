@@ -1,34 +1,10 @@
 #!/usr/local/bin/python3
-# mining monitor
+# check coin balances
 # 6/22/17
 
 
 import minor
 import requests
-from datetime import datetime
-
-
-class Miner(object):
-    'interact with the miner api'
-
-    miner_url = minor.miner_url
-
-    def __init__(self):
-        self.stats = self._get_stats()
-        self.start_time = datetime.fromtimestamp(self._get_start_time())
-
-    def _get_stats(self):
-        try:
-            r = requests.get(self.miner_url)
-            return r.json()
-        except ConnectionError:
-            print('could not connect to the miner')
-
-    def _get_start_time(self):
-        return self.stats['result'][0]['start_time']
-
-    def get_time_up(self):
-        return datetime.now() - self.start_time
 
 
 class Coin(object):
@@ -118,6 +94,3 @@ if __name__ == '__main__':
             print('{}: {:.6f}'.format(key, altcoin.info[key]))
 
         print(' - - - - - - - - \n')
-
-    miner = Miner()
-    print(miner.get_time_up())
