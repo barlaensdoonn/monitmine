@@ -39,8 +39,9 @@ class Miner(object):
             try:
                 r = requests.get(self.miner_url)
                 return r.json()
-            except ConnectionError:
-                print('could not connect to miner\n')
+            except Exception as e:
+                print('\ncould not connect to miner for the following reason:\n')
+                print(e)
                 retries -= 1
 
         print('connect retries exhausted, exiting...')
