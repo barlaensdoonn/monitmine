@@ -16,20 +16,38 @@ class Miner(object):
     '''interact with the miner api'''
 
     miner_url = minor.miner_url
+    cumulative = ['gpu_power_usage', 'temperature', 'speed_sps']
+    not_cumulative = ['accepted_shares', 'rejected_shares']
 
     def __init__(self):
         self.polls = 0
         self.stats = self._get_stats()
-        self.start_time = datetime.fromtimestamp(self._get_start_time())
-        self.shares = {
-            'total': {i: 0 for i in range(len(self.stats['result']))},
-            'average': {i: 0 for i in range(len(self.stats['result']))}
+        self.gpus = len(self.stats['result'])
+
+        self.gpu_stats = {
+            i: {
+                'busid': self.stats['result'][i]['busid'],
+                'cudaid': self.stats['result'][i]['cudaid'],
+                'gpuid': self.stats['result'][i]['gpuid'],
+                'gpu_status': self.stats['result'][i]['gpu_status'],
+                'name': self.stats['result'][i]['name'],
+                'start_time': datetime.fromtimestamp(self.stats['result'][i]['start_time']),
+                'solver': self.stats['result'][i]['solver'],
+                'gpu_power_usage': {'total': 0, 'average': 0},
+                'temperature': {'total': 0, 'average': 0},
+                'speed_sps': {'total': 0, 'average': 0},
+                'accepted_shares': {'total': 0, 'average': 0},
+                'rejected_shares': {'total': 0, 'average': 0},
+                'shares_per_min': 0
+            } for i in range(self.gpus)
         }
-        self.sps = {
-            'total': {i: 0 for i in range(len(self.stats['result']))},
-            'average': {i: 0 for i in range(len(self.stats['result']))},
-            'session_total': 0,
-            'session_average': 0
+
+        self.session_stats = {
+            'gpu_power_usage': {'total': 0, 'average': 0},
+            'temperature': {'total': 0, 'average': 0},
+            'speed_sps': {'total': 0, 'average': 0},
+            'accepted_shares': {'total': 0, 'average': 0},
+            'rejected_shares': {'total': 0, 'average': 0}
         }
 
     def _get_stats(self):
@@ -47,45 +65,58 @@ class Miner(object):
         print('connect retries exhausted, exiting...')
         sys.exit()
 
-    def _get_start_time(self):
-        return self.stats['result'][0]['start_time']
-
     def _get_up_time(self):
-        self.up_time = datetime.now() - self.start_time
+        self.up_time = datetime.now() - self.gpu_stats[0]['start_time']
 
-    def _get_sps(self):
-        for i in range(len(self.stats['result'])):
-            current_sps = self.stats['result'][i]['speed_sps']
-            self.sps['total'][i] += current_sps
-            self.sps['average'][i] = int(self.sps['total'][i] / self.polls)
-            self.sps['session_total'] += current_sps
+    def _update_stats(self):
+        self.stats = self._get_stats()
 
-        self.sps['session_average'] = int(self.sps['session_total'] / self.polls)
+        for stat in self.cumulative:
+            for i in range(self.gpus):
+                current_stat = self.stats['result'][i][stat]
+                self.gpu_stats[i][stat]['total'] += current_stat
+                self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
+                self.session_stats[stat]['total'] += current_stat
+            self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
-    def _get_shares(self):
-        for i in range(len(self.stats['result'])):
-            self.shares['total'][i] = self.stats['result'][i]['accepted_shares']
-            self.shares['average'][i] = int(self.shares['total'][i] / self.polls)
+        for stat in self.not_cumulative:
+            for i in range(self.gpus):
+                current_stat = self.stats['result'][i][stat]
+                self.gpu_stats[i][stat]['total'] = current_stat
+                self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
+                self.session_stats[stat]['total'] = current_stat
+            self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
     def _print_stats(self):
+        print('- - - - - - - - - - - - - - - - - - - - - - -')
         print('time up: {}'.format(self.up_time))
-
-        for gpu in self.sps['average']:
-            print('average sps for gpu{}: {}'.format(gpu, self.sps['average'][gpu]))
-
-        print('session average sps: {} over {} polls'.format(self.sps['session_average'], self.polls))
-
-        for gpu in miner.shares['total']:
-            print('total shares for gpu{}: {}'.format(gpu, self.shares['total'][gpu]))
 
         print('\n')
 
+        for stat in self.cumulative:
+            for gpu in self.gpu_stats:
+                print('average {} for gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
+
+        print('\n')
+
+        for stat in self.not_cumulative:
+            for gpu in self.gpu_stats:
+                print('total {} for gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['total']))
+
+        print('\n')
+
+        for stat in self.session_stats:
+            if stat in self.cumulative:
+                print('session average {}: {}'.format(stat, self.session_stats[stat]['average']))
+            elif stat in self.not_cumulative:
+                print('session total {}: {}'.format(stat, self.session_stats[stat]['total']))
+
+        print('- - - - - - - - - - - - - - - - - - - - - - -\n')
+
     def poll(self):
-        self.stats = self._get_stats()
         self.polls += 1
         self._get_up_time()
-        self._get_sps()
-        self._get_shares()
+        self._update_stats()
         self._print_stats()
 
 
