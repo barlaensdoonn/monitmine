@@ -71,20 +71,20 @@ class Miner(object):
     def _update_stats(self):
         self.stats = self._get_stats()
 
-        for stat in self.cumulative:
-            for i in range(self.gpus):
+        for i in range(self.gpus):
+            for stat in self.cumulative:
                 current_stat = self.stats['result'][i][stat]
                 self.gpu_stats[i][stat]['total'] += current_stat
                 self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
                 self.session_stats[stat]['total'] += current_stat
-            self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
-        for stat in self.not_cumulative:
-            for i in range(self.gpus):
+            for stat in self.not_cumulative:
                 current_stat = self.stats['result'][i][stat]
                 self.gpu_stats[i][stat]['total'] = current_stat
                 self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
                 self.session_stats[stat]['total'] = current_stat
+
+            self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
             self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
     def _print_stats(self):
