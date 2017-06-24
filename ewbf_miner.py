@@ -50,8 +50,8 @@ class Miner(object):
     def _get_start_time(self):
         return self.stats['result'][0]['start_time']
 
-    def _get_time_up(self):
-        self.time_up = datetime.now() - self.start_time
+    def _get_up_time(self):
+        self.up_time = datetime.now() - self.start_time
 
     def _get_sps(self):
         for i in range(len(self.stats['result'])):
@@ -68,7 +68,7 @@ class Miner(object):
             self.shares['average'][i] = int(self.shares['total'][i] / self.polls)
 
     def _print_stats(self):
-        print('time up: {}'.format(self.time_up))
+        print('time up: {}'.format(self.up_time))
 
         for gpu in self.sps['average']:
             print('average sps for gpu{}: {}'.format(gpu, self.sps['average'][gpu]))
@@ -83,7 +83,7 @@ class Miner(object):
     def poll(self):
         self.stats = self._get_stats()
         self.polls += 1
-        self._get_time_up()
+        self._get_up_time()
         self._get_sps()
         self._get_shares()
         self._print_stats()
