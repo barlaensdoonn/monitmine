@@ -68,6 +68,9 @@ class Miner(object):
     def _get_up_time(self):
         self.up_time = datetime.now() - self.gpu_stats[0]['start_time']
 
+    def _get_shares_per_min(self):
+        pass
+
     def _update_stats(self):
         self.stats = self._get_stats()
 
@@ -84,7 +87,7 @@ class Miner(object):
                 self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
                 self.session_stats[stat]['total'] = current_stat
 
-            self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
+        for stat in self.session_stats:
             self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
     def _print_stats(self):
