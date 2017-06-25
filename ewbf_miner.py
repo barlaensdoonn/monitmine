@@ -8,9 +8,7 @@
 # NOTE: to properly average values this script should be launched right after miner starts and preferably right after a % 30 seconds == 0
 
 import sys
-import time
 import minor
-import coin
 import requests
 from datetime import datetime
 
