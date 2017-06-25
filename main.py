@@ -10,13 +10,17 @@ import time
 from datetime import datetime
 
 
+def initialize_balances(coin, miner):
+    miner.initial_balance = coin.get_balance()
+    miner.last_payment = coin.get_last_payment()
+
+
 if __name__ == '__main__':
     miner = ewbf_miner.Miner()
-    polling = True
-
     zec = coin.Coin('zec')
-    miner.inital_balance = zec.get_balance()
-    miner.last_payment = zec.get_last_payment()
+
+    initialize_balances(zec, miner)
+    polling = True
 
     try:
         while polling:
