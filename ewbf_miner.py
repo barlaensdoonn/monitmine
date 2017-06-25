@@ -1,13 +1,16 @@
 #!/usr/local/bin/python3
-# mining monitor
+# ewbf zec miner api monitor
 # 6/22/17
+# updated 6/24/17
 
-# temp, gpu_power_usage, speed_sps updated by api every 30 seconds
-# to properly average values this script should be launched right after miner starts and right after a % 30 seconds == 0
+
+# NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
+# NOTE: to properly average values this script should be launched right after miner starts and preferably right after a % 30 seconds == 0
 
 import sys
 import time
 import minor
+import mntr
 import requests
 from datetime import datetime
 
@@ -24,6 +27,8 @@ class Miner(object):
         self.polls = 0
         self.stats = self._get_stats()
         self.gpus = len(self.stats['result'])
+        self.initial_balance = 0
+        self.last_payment = {}
 
         self.gpu_stats = {
             i: {
@@ -134,8 +139,6 @@ class Miner(object):
                 for nested_stat in self.session_stats[stat]:
                     print('session {} {}: {}'.format(stat, nested_stat, self.session_stats[stat][nested_stat]))
 
-        print()
-
         print('- - - - - - - - - - - - - - - - - -\n')
 
     def poll(self):
@@ -148,6 +151,10 @@ class Miner(object):
 if __name__ == '__main__':
     miner = Miner()
     polling = True
+
+    zec = mntr.Coin('zec')
+    miner.inital_balance = zec.get_balance()
+    miner.last_payment = zec.get_last_payment()
 
     try:
         while polling:
