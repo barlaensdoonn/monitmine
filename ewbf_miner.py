@@ -19,7 +19,7 @@ class Miner(object):
     miner_url = minor.miner_url
     cumulative = ['gpu_power_usage', 'temperature', 'speed_sps']
     not_cumulative = ['accepted_shares', 'rejected_shares']
-    watts = {1: 600, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
+    watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
 
     def __init__(self):
         self.polls = 0
