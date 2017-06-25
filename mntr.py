@@ -1,6 +1,7 @@
 #!/usr/local/bin/python3
 # check coin balances
 # 6/22/17
+# updated 6/24/17
 
 
 import minor
