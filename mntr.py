@@ -16,6 +16,7 @@ class Coin(object):
         self.coin = coin
         self.address = self.addresses[coin]
         self.balance = 0
+        self.payments = {}
         self.paid = 0
         self.total = 0
         self.price_btc = 0
@@ -34,27 +35,13 @@ class Coin(object):
         r = requests.get(url)
 
         if r.status_code == 200:
-            jsn = r.json()
-            return jsn['data']
+            return r.json()['data']
         else:
             return None
 
-    def _get_balance(self):
-        amount = self._request('balance')
-
-        if amount:
-            self.balance = amount
-
-    def _get_payments(self):
-        payments = self._request('payments')
-
-        if payments:
-            for payment in payments:
-                self.paid += payment['amount']
-
     def _get_total(self):
-        self._get_balance()
-        self._get_payments()
+        self.get_balance()
+        self.get_payments()
         self.total = self.balance + self.paid
 
     def _convert_to_prices(self):
@@ -66,13 +53,33 @@ class Coin(object):
         self.btc = self.total * self.price_btc
         self.usd = self.total * self.price_usd
 
+    def get_balance(self):
+        amount = self._request('balance')
+
+        if amount:
+            self.balance = amount
+
+        return self.balance
+
+    def get_payments(self):
+        self.payments = self._request('payments')
+
+        if self.payments:
+            for payment in self.payments:
+                self.paid += payment['amount']
+
+    def get_last_payment(self):
+        self.get_payments()
+
+        return self.payments[-1]
+
     def update(self):
         self._get_total()
         self._convert_to_prices()
 
         self.info = {
             'balance': self.balance,
-            'payments': self.paid,
+            'paid': self.paid,
             'total': self.total,
             'total_btc': self.btc,
             'total_usd': self.usd,
@@ -81,7 +88,7 @@ class Coin(object):
 
 
 if __name__ == '__main__':
-    stat_order = ['balance', 'payments', 'total', 'total_btc', 'total_usd', 'price']
+    stat_order = ['balance', 'paid', 'total', 'total_btc', 'total_usd', 'price']
     coins = [key for key in minor.addresses.keys()]
     total_usd = 0
     total_btc = 0
