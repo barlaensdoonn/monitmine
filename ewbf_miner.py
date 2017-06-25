@@ -19,7 +19,7 @@ class Miner(object):
     miner_url = minor.miner_url
     cumulative = ['gpu_power_usage', 'temperature', 'speed_sps']
     not_cumulative = ['accepted_shares', 'rejected_shares']
-    watts = 600
+    watts = {1: 600, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
 
     def __init__(self):
         self.polls = 0
@@ -78,32 +78,48 @@ class Miner(object):
             self.gpu_stats[gpu]['shares_per_min'] = self.gpu_stats[gpu]['accepted_shares']['total'] / up_time_mins
 
     def _get_kwhs_consumed(self):
-        self.session_stats['kWhs']['consumed'] = (self.watts / 1000) * (self.up_time.total_seconds() / 60 / 60)
+        self.session_stats['kWhs']['consumed'] = (self.watts[self.gpus] / 1000) * (self.up_time.total_seconds() / 60 / 60)
         self.session_stats['kWhs']['cost'] = self.session_stats['kWhs']['consumed'] * 0.13
 
     def _update_stats(self):
+        # NOTE: need to fix; right now session total acc/rej shares not accumulating properly,
+        #       maybe break out session stats and gpu stats into own update functions
         self.stats = self._get_stats()
 
-        for i in range(self.gpus):
+        for gpu in range(self.gpus):
+            self._update_gpu_stats(gpu)
+            self._get_shares_per_min(gpu)
+
+        self._update_session_stats()
+        self._get_kwhs_consumed()
+
+    def _update_gpu_stats(self, gpu):
+        for stat in self.cumulative:
+            current_stat = self.stats['result'][gpu][stat]
+            self.gpu_stats[gpu][stat]['total'] += current_stat
+            self.gpu_stats[gpu][stat]['average'] = self.gpu_stats[gpu][stat]['total'] / self.polls
+
+        for stat in self.not_cumulative:
+            current_stat = self.stats['result'][gpu][stat]
+            self.gpu_stats[gpu][stat]['total'] = current_stat
+            self.gpu_stats[gpu][stat]['average'] = self.gpu_stats[gpu][stat]['total'] / self.polls
+
+    def _update_session_stats(self):
+        # might work?
+        for gpu in range(self.gpus):
             for stat in self.cumulative:
-                current_stat = self.stats['result'][i][stat]
-                self.gpu_stats[i][stat]['total'] += current_stat
-                self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
+                current_stat = self.stats['result'][gpu][stat]
                 self.session_stats[stat]['total'] += current_stat
 
-            self._get_shares_per_min(i)
-
-            for stat in self.not_cumulative:
-                current_stat = self.stats['result'][i][stat]
-                self.gpu_stats[i][stat]['total'] = current_stat
-                self.gpu_stats[i][stat]['average'] = self.gpu_stats[i][stat]['total'] / self.polls
-                self.session_stats[stat]['total'] = current_stat
+        for stat in self.not_cumulative:
+            self.session_stats[stat]['total'] = 0
+            for gpu in range(self.gpus):
+                current_stat = self.stats['result'][gpu][stat]
+                self.session_stats[stat]['total'] += current_stat
 
         for stat in self.session_stats:
             if stat in self.cumulative or stat in self.not_cumulative:
                 self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
-
-        self._get_kwhs_consumed()
 
     def _print_stats(self):
         print('- - - - - - - - - - - - - - - - - -')
