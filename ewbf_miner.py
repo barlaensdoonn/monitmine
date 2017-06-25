@@ -10,7 +10,7 @@
 import sys
 import time
 import minor
-import mntr
+import coin
 import requests
 from datetime import datetime
 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     miner = Miner()
     polling = True
 
-    zec = mntr.Coin('zec')
+    zec = coin.Coin('zec')
     miner.inital_balance = zec.get_balance()
     miner.last_payment = zec.get_last_payment()
 
