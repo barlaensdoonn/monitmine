@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-# check coin balances
+# check coin balances via nanopool api
 # 6/22/17
 # updated 6/24/17
 
