@@ -82,8 +82,6 @@ class Coin(object):
         self.prices['btc'] = prices['price_btc']
         self.prices['usd'] = prices['price_usd']
 
-        return self.prices
-
     def update(self):
         self._get_total()
         self._convert_to_prices()
