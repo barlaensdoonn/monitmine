@@ -25,6 +25,7 @@ class Miner(object):
         self.polls = 0
         self.stats = self._get_stats()
         self.start_time = datetime.fromtimestamp(self.stats['result'][0]['start_time'])
+        self.up_time = 0
         self.gpus = len(self.stats['result'])
 
         self.gpu_stats = {
