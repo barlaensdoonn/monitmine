@@ -16,13 +16,13 @@ if __name__ == '__main__':
     zec = coin.Coin('zec')
     earnings = earnings.Earnings(zec, miner)
 
-    earnings.initialize_balances()
     polling = True
 
     try:
         while polling:
             if int(datetime.now().timestamp() % 30) == 0:
                 miner.poll()
+                earnings.update()
                 time.sleep(1)
 
     except KeyboardInterrupt:
