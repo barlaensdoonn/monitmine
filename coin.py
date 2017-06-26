@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 6/24/17
+# updated 6/26/17
 
 
 import minor
@@ -20,10 +20,13 @@ class Coin(object):
         self.payments = {}
         self.paid = 0
         self.total = 0
-        self.price_btc = 0
-        self.price_usd = 0
         self.btc = 0
         self.usd = 0
+
+        self.prices = {
+            'btc': 0,
+            'usd': 0
+        }
 
     def _construct_url(self, action):
         if action == 'prices':
@@ -46,13 +49,10 @@ class Coin(object):
         self.total = self.balance + self.paid
 
     def _convert_to_prices(self):
-        prices = self._request('prices')
+        self.get_prices()
 
-        self.price_btc = prices['price_btc']
-        self.price_usd = prices['price_usd']
-
-        self.btc = self.total * self.price_btc
-        self.usd = self.total * self.price_usd
+        self.btc = self.total * self.prices['btc']
+        self.usd = self.total * self.prices['usd']
 
     def get_balance(self):
         amount = self._request('balance')
@@ -76,6 +76,14 @@ class Coin(object):
 
         return self.payments[-1]
 
+    def get_prices(self):
+        prices = self._request('prices')
+
+        self.prices['btc'] = prices['price_btc']
+        self.prices['usd'] = prices['price_usd']
+
+        return self.prices
+
     def update(self):
         self._get_total()
         self._convert_to_prices()
@@ -86,7 +94,7 @@ class Coin(object):
             'total': self.total,
             'total_btc': self.btc,
             'total_usd': self.usd,
-            'price': self.price_usd
+            'price': self.prices['usd']
         }
 
 
