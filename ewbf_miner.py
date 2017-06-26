@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 6/24/17
+# updated 6/25/17
 
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
@@ -14,7 +14,7 @@ from datetime import datetime
 
 
 class Miner(object):
-    '''interact with the miner api'''
+    '''interact with the EWBF miner api'''
 
     miner_url = minor.miner_url
     cumulative = ['gpu_power_usage', 'temperature', 'speed_sps']
@@ -24,9 +24,8 @@ class Miner(object):
     def __init__(self):
         self.polls = 0
         self.stats = self._get_stats()
+        self.start_time = datetime.fromtimestamp(self.stats['result'][0]['start_time'])
         self.gpus = len(self.stats['result'])
-        self.initial_balance = 0
-        self.last_payment = {}
 
         self.gpu_stats = {
             i: {
@@ -35,7 +34,7 @@ class Miner(object):
                 'gpuid': self.stats['result'][i]['gpuid'],
                 'gpu_status': self.stats['result'][i]['gpu_status'],
                 'name': self.stats['result'][i]['name'],
-                'start_time': datetime.fromtimestamp(self.stats['result'][i]['start_time']),
+                'start_time': self.start_time,
                 'solver': self.stats['result'][i]['solver'],
                 'gpu_power_usage': {'total': 0, 'average': 0},
                 'temperature': {'total': 0, 'average': 0},
