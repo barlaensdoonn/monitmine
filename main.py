@@ -6,20 +6,17 @@
 
 import coin
 import ewbf_miner
+import earnings
 import time
 from datetime import datetime
-
-
-def initialize_balances(coin, miner):
-    miner.initial_balance = coin.get_balance()
-    miner.last_payment = coin.get_last_payment()
 
 
 if __name__ == '__main__':
     miner = ewbf_miner.Miner()
     zec = coin.Coin('zec')
+    earnings = earnings.Earnings(zec, miner)
 
-    initialize_balances(zec, miner)
+    earnings.initialize_balances()
     polling = True
 
     try:
