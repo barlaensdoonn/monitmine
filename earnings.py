@@ -33,17 +33,19 @@ class Earnings(object):
         self.earnings = {
             'coin': {
                 'session_total': 0,
-                'per_minute': 0,
+                'per_min': 0,
                 'per_hour': 0,
                 'per_day': 0,
-                'per_month': 0
+                'per_month': 0,
+                'per_year': 0
             },
             'usd': {
                 'session_total': 0,
-                'per_minute': 0,
+                'per_min': 0,
                 'per_hour': 0,
                 'per_day': 0,
-                'per_month': 0
+                'per_month': 0,
+                'per_year': 0
             }
         }
 
@@ -85,6 +87,19 @@ class Earnings(object):
             self.payments['this_session'].insert(0, self.payments['most_recent'])
             self.payments['last'] = self.payments['most_recent']
 
+    def _calculate_rates(self):
+        self.earnings['coin']['per_min'] = self.earnings['coin']['session_total'] / self.miner.up_time.total_seconds() * 60
+        self.earnings['coin']['per_hour'] = self.earnings['coin']['per_min'] * 60
+        self.earnings['coin']['per_day'] = self.earnings['coin']['per_hour'] * 24
+        self.earnings['coin']['per_year'] = self.earnings['coin']['per_day'] * 365
+        self.earnings['coin']['per_month'] = self.earnings['coin']['per_year'] / 12
+
+    def _convert_to_usd(self):
+        self.coin.get_prices()
+
+        for key in self.earnings['coin']:
+            self.earnings['usd'][key] = self.earnings['coin'][key] * self.coin.prices['usd']
+
     def recalculate_earnings(self):
         self.earnings['coin']['session_total'] = self.balances['current']
 
@@ -94,6 +109,9 @@ class Earnings(object):
 
             if self.payments['initial']:
                 self.earnings['coin']['session_total'] -= self.balances['initial']
+
+        self._calculate_rates()
+        self._convert_to_usd()
 
         self.recalculate = False
 

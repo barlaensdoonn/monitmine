@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 6/25/17
+# updated 6/26/17
 
 
 import coin
