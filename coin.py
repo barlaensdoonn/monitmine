@@ -69,6 +69,8 @@ class Coin(object):
             for payment in self.payments:
                 self.paid += payment['amount']
 
+        return self.payments
+
     def get_last_payment(self):
         self.get_payments()
 
