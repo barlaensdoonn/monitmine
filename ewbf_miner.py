@@ -128,12 +128,6 @@ class Miner(object):
 
         print()
 
-        # for stat in self.cumulative:
-        #     for gpu in self.gpu_stats:
-        #         print('average {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
-        #
-        # print()
-
         for gpu in self.gpu_stats:
             print('average {} gpu{}: {}'.format('speed_sps', gpu, self.gpu_stats[gpu]['speed_sps']['average']))
 
