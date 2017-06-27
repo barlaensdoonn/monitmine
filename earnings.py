@@ -8,13 +8,15 @@ from datetime import datetime
 
 
 class Earnings(object):
-    '''calculate miner earning statistics'''
+    '''
+    calculate miner earning statistics
+    '''
 
     def __init__(self, coin, miner):
         self.coin = coin
         self.currency = coin.coin
         self.miner = miner
-        self.past_paid = False
+        self.late_launch = False
         self.recalculate = False
 
         self.balances = {
@@ -24,7 +26,6 @@ class Earnings(object):
         }
 
         self.payments = {
-            'initial': {},
             'last': {},
             'most_recent': {},
             'this_session': []
@@ -59,18 +60,15 @@ class Earnings(object):
 
             if pay_date > self.miner.start_time:
                 self.payments['this_session'].append(payment)
-                self.past_paid = True
+                self.late_launch = True
 
     def _initialize(self):
         self._check_past_payments()
+        self.payments['last'] = self.coin.get_last_payment()
+        self._update_balance()
 
-        if self.past_paid:
-            self.payments['last'] = self.coin.get_last_payment()
-        else:
-            for key in ['initial', 'last']:
-                self.payments[key] = self.coin.get_last_payment()
-
-            self.balances['initial'] = self.payments['initial']['amount']
+        if not self.late_launch:
+            self.balances['initial'] = self.balances['current']
 
     def _update_balance(self):
         self.balances['most_recent'] = self.coin.get_balance()
@@ -107,8 +105,8 @@ class Earnings(object):
             for payment in self.payments['this_session']:
                 self.earnings['coin']['session_total'] += payment['amount']
 
-            if self.payments['initial']:
-                self.earnings['coin']['session_total'] -= self.balances['initial']
+        if not self.late_launch:
+            self.earnings['coin']['session_total'] -= self.balances['initial']
 
         self._calculate_rates()
         self._convert_to_usd()
