@@ -1,11 +1,11 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 6/25/17
+# updated 6/26/17
 
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
-# NOTE: to properly average values this script should be launched right after miner starts and preferably right after a % 30 seconds == 0
+# NOTE: to properly average values this script should be launched right after miner starts and preferably right after % 30 seconds == 0
 
 import sys
 import minor
@@ -123,6 +123,7 @@ class Miner(object):
 
     def _print_stats(self):
         print('- - - - - - - - - - - - - - - - - -')
+        print('start time: {}'.format(self.start_time))
         print('time up: {}'.format(self.up_time))
 
         print()
