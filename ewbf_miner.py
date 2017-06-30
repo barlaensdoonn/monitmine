@@ -17,7 +17,7 @@ class Miner(object):
     '''interact with the EWBF miner api'''
 
     miner_url = minor.miner_url
-    cumulative = ['gpu_power_usage', 'temperature', 'speed_sps']
+    cumulative = ['temperature', 'speed_sps']  # leaving out 'gpu_power_usage' since it's pretty much static
     not_cumulative = ['accepted_shares', 'rejected_shares']
     watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
 
@@ -47,7 +47,7 @@ class Miner(object):
         }
 
         self.session_stats = {
-            'gpu_power_usage': {'total': 0, 'average': 0},
+            # 'gpu_power_usage': {'total': 0, 'average': 0},  # leaving out since it's pretty much static
             'temperature': {'total': 0, 'average': 0},
             'speed_sps': {'total': 0, 'average': 0},
             'accepted_shares': {'total': 0, 'average': 0},
@@ -128,8 +128,9 @@ class Miner(object):
 
         print()
 
-        for gpu in self.gpu_stats:
-            print('average {} gpu{}: {}'.format('speed_sps', gpu, self.gpu_stats[gpu]['speed_sps']['average']))
+        for stat in self.cumulative:
+            for gpu in self.gpu_stats:
+                print('average {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
 
         for stat in self.not_cumulative:
             for gpu in self.gpu_stats:
