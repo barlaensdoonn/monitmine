@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 6/26/17
+# updated 6/29/17
 
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
@@ -82,8 +82,6 @@ class Miner(object):
         self.session_stats['kWhs']['cost'] = self.session_stats['kWhs']['consumed'] * 0.13
 
     def _update_stats(self):
-        # NOTE: need to fix; right now session total acc/rej shares not accumulating properly,
-        #       maybe break out session stats and gpu stats into own update functions
         self.stats = self._get_stats()
 
         for gpu in range(self.gpus):
