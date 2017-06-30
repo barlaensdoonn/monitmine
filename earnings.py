@@ -31,24 +31,29 @@ class Earnings(object):
             'this_session': []
         }
 
+        self.rates = {
+            'per_min': 0.01666666666667,
+            'per_hour': 60,
+            'per_day': 24,
+            'per_month': 30.41666666666667,
+            'per_year': 365
+        }
+
         self.earnings = {
             'coin': {
-                'session_total': 0,
-                'per_min': 0,
-                'per_hour': 0,
-                'per_day': 0,
-                'per_month': 0,
-                'per_year': 0
+                'gross': {'session_total': 0},
+                'net': {'session_total': 0}
             },
             'usd': {
-                'session_total': 0,
-                'per_min': 0,
-                'per_hour': 0,
-                'per_day': 0,
-                'per_month': 0,
-                'per_year': 0
+                'gross': {'session_total': 0},
+                'net': {'session_total': 0}
             }
         }
+
+        for key in self.earnings.keys():
+            for nestkey in self.earnings[key].keys():
+                for rate in self.rates:
+                    self.earnings[key][nestkey][rate] = 0
 
         self._initialize()
 
