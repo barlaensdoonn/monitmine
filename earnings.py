@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 6/26/17
+# updated 6/29/17
 
 
 from datetime import datetime
@@ -65,6 +65,7 @@ class Earnings(object):
     def _initialize(self):
         self._check_past_payments()
         self.payments['last'] = self.coin.get_last_payment()
+        self._update_payments()
         self._update_balance()
 
         if not self.late_launch:
@@ -98,7 +99,7 @@ class Earnings(object):
         for key in self.earnings['coin']:
             self.earnings['usd'][key] = self.earnings['coin'][key] * self.coin.prices['usd']
 
-    def recalculate_earnings(self):
+    def _recalculate_earnings(self):
         self.earnings['coin']['session_total'] = self.balances['current']
 
         if self.payments['this_session']:
@@ -110,17 +111,20 @@ class Earnings(object):
 
         self._calculate_rates()
         self._convert_to_usd()
+        self._print_earnings()
 
         self.recalculate = False
+
+    def _print_earnings(self):
+        print('earnings updated')
+        print('coin:')
+        print(self.earnings['coin'])
+        print('usd:')
+        print(self.earnings['usd'])
 
     def update(self):
         self._update_balance()
         self._update_payments()
 
         if self.recalculate:
-            self.recalculate_earnings()
-            print('earnings updated')
-            print('coin:')
-            print(self.earnings['coin'])
-            print('usd:')
-            print(self.earnings['usd'])
+            self._recalculate_earnings()
