@@ -77,10 +77,6 @@ class Miner(object):
             up_time_mins = self.up_time.total_seconds() / 60
             self.gpu_stats[gpu]['shares_per_min'] = self.gpu_stats[gpu]['accepted_shares']['total'] / up_time_mins
 
-    def _get_kwhs_consumed(self):
-        self.session_stats['kWhs']['consumed'] = (self.watts[self.gpus] / 1000) * (self.up_time.total_seconds() / 60 / 60)
-        self.session_stats['kWhs']['cost'] = self.session_stats['kWhs']['consumed'] * 0.13
-
     def _update_stats(self):
         self.stats = self._get_stats()
 
@@ -151,6 +147,10 @@ class Miner(object):
                     print('session {} {}: {}'.format(stat, nested_stat, self.session_stats[stat][nested_stat]))
 
         print('- - - - - - - - - - - - - - - - - -\n')
+
+    def get_kwhs_consumed(self):
+        self.session_stats['kWhs']['consumed'] = (self.watts[self.gpus] / 1000) * (self.up_time.total_seconds() / 60 / 60)
+        self.session_stats['kWhs']['cost'] = self.session_stats['kWhs']['consumed'] * 0.13
 
     def poll(self):
         self.polls += 1
