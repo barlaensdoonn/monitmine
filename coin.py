@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 6/26/17
+# updated 6/29/17
 
 
 import minor
@@ -9,7 +9,7 @@ import requests
 
 
 class Coin(object):
-    'basic functions to interact with nanopool api'
+    '''basic functions to interact with nanopool api'''
 
     addresses = minor.addresses
 
@@ -74,7 +74,7 @@ class Coin(object):
     def get_last_payment(self):
         self.get_payments()
 
-        return self.payments[-1]
+        return self.payments[0]
 
     def get_prices(self):
         prices = self._request('prices')
