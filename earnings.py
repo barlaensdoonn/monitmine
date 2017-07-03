@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 6/29/17
+# updated 7/03/17
 
 
 from datetime import datetime
@@ -41,19 +41,22 @@ class Earnings(object):
 
         self.earnings = {
             'coin': {
-                'gross': {'session_total': 0},
-                'net': {'session_total': 0}
+                'session_total': 0,
+                'per_min': 0,
+                'per_hour': 0,
+                'per_day': 0,
+                'per_month': 0,
+                'per_year': 0
             },
             'usd': {
-                'gross': {'session_total': 0},
-                'net': {'session_total': 0}
+                'session_total': 0,
+                'per_min': 0,
+                'per_hour': 0,
+                'per_day': 0,
+                'per_month': 0,
+                'per_year': 0
             }
         }
-
-        for key in self.earnings.keys():
-            for nestkey in self.earnings[key].keys():
-                for rate in self.rates:
-                    self.earnings[key][nestkey][rate] = 0
 
         self._initialize()
 
