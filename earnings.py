@@ -121,7 +121,7 @@ class Earnings(object):
         self.recalculate = False
 
     def _print_earnings(self):
-        print('earnings updated')
+        print('earnings updated at {}'.format(datetime.now()))
         print('coin:')
         print(self.earnings['coin'])
         print('usd:')
