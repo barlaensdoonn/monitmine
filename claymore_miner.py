@@ -7,11 +7,11 @@ import json
 import socket
 import minor
 
-host = minor.claymore_host
-port = minor.claymore_port
-
 
 def create_client():
+    host = minor.claymore_host
+    port = minor.claymore_port
+
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((host, port))
 
