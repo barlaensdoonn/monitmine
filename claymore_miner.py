@@ -16,6 +16,7 @@ class Miner(object):
 
     def __init__(self):
         self.polls = 0
+        self.request = self._create_request()
         self.stats = self._get_stats()
         self.miner_version = self.stats[0]
         self.start_time = datetime.now() - timedelta(minutes=int(self.stats[1]))
@@ -58,6 +59,11 @@ class Miner(object):
             'kWhs': {'consumed': 0, 'cost': 0}
         }
 
+    def _create_request(self):
+        request = {'method': 'miner_getstat1', 'jsonrpc': '2.0', 'id': 0}
+
+        return json.dumps(request)
+
     def _get_number_of_gpus(self):
         if isinstance(self.stats[3], list):
             return len(self.stats[3])
@@ -74,9 +80,13 @@ class Miner(object):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect((host, port))
 
-    def _create_request(self):
-        request = {'method': 'miner_getstat1', 'jsonrpc': '2.0', 'id': 0}
-        self.request = json.dumps(request)
+    def _convert_to_int(self, thing):
+        try:
+            thing = int(thing)
+        except ValueError:
+            pass
+
+        return thing
 
     def _parse_stats(self, stats):
         for i in range(len(stats)):
@@ -89,17 +99,8 @@ class Miner(object):
 
         return stats
 
-    def _convert_to_int(self, thing):
-        try:
-            thing = int(thing)
-        except ValueError:
-            pass
-
-        return thing
-
     def _get_stats(self):
         self._create_client()
-        self._create_request()
         self.client.send(self.request.encode('ascii'))
         response = self.client.recv(1024)
 
@@ -118,4 +119,3 @@ class Miner(object):
 if __name__ == '__main__':
     miner = Miner()
     print(miner.stats)
-    print(miner.gpus)
