@@ -75,6 +75,8 @@ class Miner(object):
         self.request = json.dumps(request)
 
     def _get_stats(self):
+        self._create_client()
+        self._create_request()
         self.client.send(self.request.encode('ascii'))
         response = self.client.recv(1024)
 
@@ -85,3 +87,8 @@ class Miner(object):
         else:
             print('could not get stats due to error {}'.format(stats['error']))
             return None
+
+
+if __name__ == '__main__':
+    miner = Miner()
+    print(miner.stats)
