@@ -59,7 +59,7 @@ class Miner(object):
         }
 
     def _get_number_of_gpus(self):
-        if type(self.stats[3]) == list:
+        if isinstance(self.stats[3], list):
             return len(self.stats[3])
         else:
             return 1
@@ -78,12 +78,24 @@ class Miner(object):
         request = {'method': 'miner_getstat1', 'jsonrpc': '2.0', 'id': 0}
         self.request = json.dumps(request)
 
-    def _split_stats(self, stats):
+    def _parse_stats(self, stats):
         for i in range(len(stats)):
             if ';' in stats[i]:
                 stats[i] = stats[i].split(';')
+                for j in range(len(stats[i])):
+                    stats[i][j] = self._convert_to_int(stats[i][j])
+            else:
+                stats[i] = self._convert_to_int(stats[i])
 
         return stats
+
+    def _convert_to_int(self, thing):
+        try:
+            thing = int(thing)
+        except ValueError:
+            pass
+
+        return thing
 
     def _get_stats(self):
         self._create_client()
@@ -94,7 +106,7 @@ class Miner(object):
         stats = json.loads(response.decode('ascii'))
 
         if not stats['error']:
-            return self._split_stats(stats['result'])
+            return self._parse_stats(stats['result'])
         else:
             print('could not get stats due to error {}'.format(stats['error']))
             return None
