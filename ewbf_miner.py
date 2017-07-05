@@ -1,8 +1,7 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 7/03/17
-
+# updated 7/04/17
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
 # NOTE: to properly average values this script should be launched right after miner starts and preferably right after % 30 seconds == 0
@@ -16,7 +15,7 @@ from datetime import datetime
 class Miner(object):
     '''interact with the EWBF miner api'''
 
-    miner_url = minor.miner_url
+    miner_url = minor.ewbf_url
     cumulative = ['temperature', 'speed_sps']  # leaving out 'gpu_power_usage' since it's pretty much static
     not_cumulative = ['accepted_shares', 'rejected_shares']
     watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
@@ -35,7 +34,6 @@ class Miner(object):
                 'gpuid': self.stats['result'][i]['gpuid'],
                 'gpu_status': self.stats['result'][i]['gpu_status'],
                 'name': self.stats['result'][i]['name'],
-                'start_time': self.start_time,
                 'solver': self.stats['result'][i]['solver'],
                 'gpu_power_usage': {'total': 0, 'average': 0},
                 'temperature': {'total': 0, 'average': 0},
@@ -71,7 +69,7 @@ class Miner(object):
         sys.exit()
 
     def _get_up_time(self):
-        self.up_time = datetime.now() - self.gpu_stats[0]['start_time']
+        self.up_time = datetime.now() - self.start_time
 
     def _get_shares_per_min(self, gpu):
             up_time_mins = self.up_time.total_seconds() / 60
@@ -99,7 +97,6 @@ class Miner(object):
             self.gpu_stats[gpu][stat]['average'] = self.gpu_stats[gpu][stat]['total'] / self.polls
 
     def _update_session_stats(self):
-        # might work?
         for gpu in range(self.gpus):
             for stat in self.cumulative:
                 current_stat = self.stats['result'][gpu][stat]
