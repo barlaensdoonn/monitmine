@@ -21,6 +21,8 @@ class Miner(object):
         self.start_time = datetime.now() - timedelta(minutes=int(self.stats[1]))
         self.up_time = 0
         self.gpus = self._get_number_of_gpus()
+        self.pools = self.stats[7]
+        self.coins = [self.pools[i][0:3] for i in range(len(self.pools))]
 
         self.stats_lookup_table = {
             0: 'version',
@@ -51,12 +53,14 @@ class Miner(object):
             'rejected_shares': {'total': 0, 'average': 0},
             'accepted_shares_alt': {'total': 0, 'average': 0},
             'rejected_shares_alt': {'total': 0, 'average': 0},
+            'shares_per_min': {'total': 0, 'average': 0},
+            'shares_per_min_alt': {'total': 0, 'average': 0},
             'kWhs': {'consumed': 0, 'cost': 0}
         }
 
     def _get_number_of_gpus(self):
-        if ';' in self.stats[3]:
-            return len(self.stats[2].split(';'))
+        if type(self.stats[3]) == list:
+            return len(self.stats[3])
         else:
             return 1
 
@@ -74,6 +78,13 @@ class Miner(object):
         request = {'method': 'miner_getstat1', 'jsonrpc': '2.0', 'id': 0}
         self.request = json.dumps(request)
 
+    def _split_stats(self, stats):
+        for i in range(len(stats)):
+            if ';' in stats[i]:
+                stats[i] = stats[i].split(';')
+
+        return stats
+
     def _get_stats(self):
         self._create_client()
         self._create_request()
@@ -83,12 +94,16 @@ class Miner(object):
         stats = json.loads(response.decode('ascii'))
 
         if not stats['error']:
-            return stats['result']
+            return self._split_stats(stats['result'])
         else:
             print('could not get stats due to error {}'.format(stats['error']))
             return None
+
+    def _update_stats(self):
+        pass
 
 
 if __name__ == '__main__':
     miner = Miner()
     print(miner.stats)
+    print(miner.gpus)
