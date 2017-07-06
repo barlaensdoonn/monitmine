@@ -28,21 +28,21 @@ class Miner(object):
         self.stats_lookup_table = {
             0: 'version',
             1: 'mins_up',
-            2: ['total_mhs', 'total_shares', 'total_shares_rejected'],
-            3: 'mhs_per_gpu',
-            4: ['total_mhs_alt', 'total_shares_alt', 'total_shares_rejected_alt'],
-            5: 'mhs_per_gpu_alt',
-            6: ['temp', 'fan_speed'],
+            2: ['hashrate_mhs', 'accepted_shares', 'rejected_shares'],
+            3: 'gpu_hashrate_mhs',
+            4: ['hashrate_mhs_alt', 'accepted_shares_alt', 'rejected_shares_alt'],
+            5: 'gpu_hashrate_mhs_alt',
+            6: ['gpu_temperature', 'gpu_fan_speed'],
             7: 'current_pools',
             8: ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
         }
 
         self.gpu_stats = {
             i: {
-                'temperature': {'total': 0, 'average': 0},
-                'fan_speed': {'total': 0, 'average': 0},
-                'hashrate_mhs': {'total': 0, 'average': 0},
-                'hashrate_mhs_alt': {'total': 0, 'average': 0}
+                'gpu_temperature': {'total': 0, 'average': 0},
+                'gpu_fan_speed': {'total': 0, 'average': 0},
+                'gpu_hashrate_mhs': {'total': 0, 'average': 0},
+                'gpu_hashrate_mhs_alt': {'total': 0, 'average': 0}
             } for i in range(self.gpus)
         }
 
