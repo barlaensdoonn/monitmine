@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # claymore miner api monitor
 # 7/03/17
-# updated 7/04/17
+# updated 7/05/17
 
 import json
 import socket
@@ -25,17 +25,17 @@ class Miner(object):
         self.pools = self.stats[7]
         self.coins = [self.pools[i][0:3] for i in range(len(self.pools))]
 
-        self.stats_lookup_table = {
-            0: 'version',
-            1: 'mins_up',
-            2: ['hashrate_mhs', 'accepted_shares', 'rejected_shares'],
-            3: 'gpu_hashrate_mhs',
-            4: ['hashrate_mhs_alt', 'accepted_shares_alt', 'rejected_shares_alt'],
-            5: 'gpu_hashrate_mhs_alt',
-            6: ['gpu_temperature', 'gpu_fan_speed'],
-            7: 'current_pools',
-            8: ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
-        }
+        self.labels = [
+            'version',
+            'mins_up',
+            ['hashrate_mhs', 'accepted_shares', 'rejected_shares'],
+            'gpu_hashrate_mhs',
+            ['hashrate_mhs_alt', 'accepted_shares_alt', 'rejected_shares_alt'],
+            'gpu_hashrate_mhs_alt',
+            ['gpu_temperature', 'gpu_fan_speed'],
+            'current_pools',
+            ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
+        ]
 
         self.gpu_stats = {
             i: {
@@ -98,6 +98,18 @@ class Miner(object):
                 stats[i] = self._convert_to_int(stats[i])
 
         return stats
+
+    def _zip_stats(self, stats):
+        zipped_stats = {}
+
+        for stat in zip(self.api_response_labels, stats):
+            if isinstance(stat[0], list):
+                for i in range(len(stat[0])):
+                    zipped_stats[stat[0]] = stat[0][i]
+            else:
+                zipped_stats[stat[0]] = stat[1]
+
+        return zipped_stats
 
     def _get_stats(self):
         self._create_client()
