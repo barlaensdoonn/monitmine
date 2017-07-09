@@ -21,17 +21,17 @@ if __name__ == '__main__':
 
     logging.config.dictConfig(log_config)
 
-    claymore = claymore_miner.Miner()
-    ewbf = ewbf_miner.Miner()
-    zec = coin.Coin('zec')
-    earnings = earnings.Earnings(zec, ewbf)
+    claymore_miner = claymore_miner.Miner()
+    ewbf_miner = ewbf_miner.Miner()
+    ewbf_coin = coin.Coin(ewbf_miner.coin)
+    earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
 
     polling = True
 
     try:
         while polling:
             if int(datetime.now().timestamp() % 30) == 0:
-                ewbf.poll()
+                ewbf_miner.poll()
                 earnings.update()
                 time.sleep(1)
 
