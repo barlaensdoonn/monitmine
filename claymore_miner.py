@@ -3,6 +3,7 @@
 # 7/03/17
 # updated 7/09/17
 
+import sys
 import json
 import socket
 import minor
@@ -111,17 +112,30 @@ class Miner(object):
         self.stats = zipped_stats
 
     def _get_stats(self):
-        self._create_client()
-        self.client.send(self.request.encode('ascii'))
-        response = self.client.recv(1024)
+        retries = 5
 
-        stats = json.loads(response.decode('ascii'))
+        while retries:
+            try:
+                self._create_client()
+                self.client.send(self.request.encode('ascii'))
+                response = self.client.recv(1024)
 
-        if not stats['error']:
-            self.stats = stats['result']
-        else:
-            print('could not get stats due to error {}'.format(stats['error']))
-            return None
+                stats = json.loads(response.decode('ascii'))
+
+                if not stats['error']:
+                    self.stats = stats['result']
+                    return
+                else:
+                    print('could not get stats due to error {}'.format(stats['error']))
+                    retries -= 1
+
+            except Exception as e:
+                print('\ncould not connect to miner for the following reason:\n')
+                print(e)
+                retries -= 1
+
+        print('connect retries exhausted, exiting...')
+        sys.exit()
 
     def _update_stats(self):
         self._get_stats()
