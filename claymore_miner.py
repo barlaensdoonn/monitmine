@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # claymore miner api monitor
 # 7/03/17
-# updated 7/05/17
+# updated 7/09/17
 
 import json
 import socket
@@ -14,18 +14,19 @@ class Miner(object):
 
     watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
 
+    api_response_labels = [
+        'version',
+        'mins_up',
+        ['hashrate_mhs', 'accepted_shares', 'rejected_shares'],
+        'gpu_hashrate_mhs',
+        ['hashrate_mhs_alt', 'accepted_shares_alt', 'rejected_shares_alt'],
+        'gpu_hashrate_mhs_alt',
+        ['gpu_temperature', 'gpu_fan_speed'],
+        'current_pools',
+        ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
+    ]
+
     def __init__(self):
-        self.api_response_labels = [
-            'version',
-            'mins_up',
-            ['hashrate_mhs', 'accepted_shares', 'rejected_shares'],
-            'gpu_hashrate_mhs',
-            ['hashrate_mhs_alt', 'accepted_shares_alt', 'rejected_shares_alt'],
-            'gpu_hashrate_mhs_alt',
-            ['gpu_temperature', 'gpu_fan_speed'],
-            'current_pools',
-            ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
-        ]
 
         self.polls = 0
         self.request = self._create_request()
