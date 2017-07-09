@@ -24,7 +24,7 @@ if __name__ == '__main__':
     claymore_miner = claymore_miner.Miner()
     ewbf_miner = ewbf_miner.Miner()
     ewbf_coin = coin.Coin(ewbf_miner.coin)
-    earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
+    ewbf_earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
 
     polling = True
 
@@ -32,9 +32,12 @@ if __name__ == '__main__':
         while polling:
             if int(datetime.now().timestamp() % 30) == 0:
                 ewbf_miner.poll()
-                earnings.update()
+                ewbf_earnings.update()
                 time.sleep(1)
 
     except KeyboardInterrupt:
-        print('\nexiting...')
+        claymore_miner.logger.info('...user exit received...')
+        ewbf_earnings.logger.info('...user exit received...')
+        logging.info('...user exit received...')
+        logging.info('exiting...')
         polling = False
