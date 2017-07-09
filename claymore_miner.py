@@ -5,11 +5,9 @@
 
 import sys
 import json
-import yaml
 import minor
 import socket
 import logging
-import logging.config
 from datetime import datetime, timedelta
 
 
@@ -32,10 +30,7 @@ class Miner(object):
     ]
 
     def __init__(self):
-        self.logger = logging.getLogger('claymore')
-        self.logger.info('* * * * * * * * * * * * * * * * * * * *')
-        self.logger.info('logger instantiated')
-
+        self._initialize_logger()
         self.polls = 0
         self.request = self._create_request()
         self._update_stats()
@@ -67,6 +62,11 @@ class Miner(object):
             'shares_per_min_alt': {'total': 0, 'average': 0},
             'kWhs': {'consumed': 0, 'cost': 0}
         }
+
+    def _initialize_logger(self):
+        self.logger = logging.getLogger('claymore')
+        self.logger.info('* * * * * * * * * * * * * * * * * * * *')
+        self.logger.info('logger instantiated')
 
     def _create_request(self):
         return json.dumps(self.request)
