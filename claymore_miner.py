@@ -66,7 +66,8 @@ class Miner(object):
     def _initialize_logger(self):
         self.logger = logging.getLogger('claymore')
         self.logger.info('* * * * * * * * * * * * * * * * * * * *')
-        self.logger.info('logger instantiated')
+        self.logger.info('claymore logger instantiated')
+        self.logger.info('monitoring session started')
 
     def _create_request(self):
         return json.dumps(self.request)
@@ -131,15 +132,15 @@ class Miner(object):
                     self.stats = stats['result']
                     return
                 else:
-                    print('could not get stats due to error {}'.format(stats['error']))
+                    self.logger.error('could not get stats due to error {}'.format(stats['error']))
                     retries -= 1
 
             except Exception as e:
-                print('\ncould not connect to miner for the following reason:\n')
+                self.logger.error('could not connect to miner for the following reason:')
                 print(e)
                 retries -= 1
 
-        print('connect retries exhausted, exiting...')
+        self.logger.error('connect retries exhausted, exiting...')
         sys.exit()
 
     def _update_stats(self):
