@@ -1,9 +1,9 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 7/03/17
+# updated 7/09/17
 
-
+import logging
 from datetime import datetime
 
 
@@ -12,7 +12,10 @@ class Earnings(object):
     calculate miner earning statistics
     '''
 
+    log_order = ['per_min', 'per_hour', 'per_day', 'per_month', 'per_year', 'session_total']
+
     def __init__(self, coin, miner):
+        self._initialize_logger()
         self.coin = coin
         self.currency = coin.coin
         self.miner = miner
@@ -59,6 +62,12 @@ class Earnings(object):
         }
 
         self._initialize()
+
+    def _initialize_logger(self):
+        self.logger = logging.getLogger('earnings')
+        self.logger.info('* * * * * * * * * * * * * * * * * * * *')
+        self.logger.info('earnings logger instantiated')
+        self.logger.info('monitoring session started')
 
     def _check_past_payments(self):
         all_payments = self.coin.get_payments()
@@ -119,16 +128,17 @@ class Earnings(object):
 
         self._calculate_rates()
         self._convert_to_usd()
-        self._print_earnings()
+        self._log_earnings()
 
         self.recalculate = False
 
-    def _print_earnings(self):
-        print('earnings updated at {}'.format(datetime.now()))
-        print('coin:')
-        print(self.earnings['coin'])
-        print('usd:')
-        print(self.earnings['usd'])
+    def _log_earnings(self):
+        self.logger.info('{} earnings updated at {}'.format(self.currency.upper(), datetime.now()))
+
+        for key in self.earnings:
+            self.logger.info('- - - - - - - - {} - - - - - - - - - '.format(key))
+            for thing in self.log_order:
+                self.logger.info('{}: {}'.format(thing, self.earnings[key][thing]))
 
     def update(self):
         self._update_balance()
