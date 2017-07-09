@@ -32,7 +32,10 @@ class Miner(object):
     ]
 
     def __init__(self):
-        # self.logger = logging.getLogger('claymore')
+        self.logger = logging.getLogger('claymore')
+        self.logger.info('* * * * * * * * * * * * * * * * * * * *')
+        self.logger.info('logger instantiated')
+
         self.polls = 0
         self.request = self._create_request()
         self._update_stats()
@@ -146,13 +149,5 @@ class Miner(object):
 
 
 if __name__ == '__main__':
-    with open(minor.log_conf, 'r') as log_conf:
-        log_config = yaml.safe_load(log_conf)
-
-    logging.config.dictConfig(log_config)
-    logger = logging.getLogger('claymore')
-    logger.info('* * * * * * * * * * * * * * * * * * * *')
-    logger.info('logger instantiated')
-
     miner = Miner()
     print(miner.stats)
