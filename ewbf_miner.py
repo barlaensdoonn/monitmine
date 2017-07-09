@@ -19,6 +19,7 @@ class Miner(object):
     cumulative = ['temperature', 'speed_sps']  # leaving out 'gpu_power_usage' since it's pretty much static
     not_cumulative = ['accepted_shares', 'rejected_shares']
     watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
+    coin = 'zec'
 
     def __init__(self):
         self.polls = 0
