@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # claymore miner api monitor
 # 7/03/17
-# updated 7/09/17
+# updated 7/05/17
 
 import json
 import socket
@@ -15,16 +15,6 @@ class Miner(object):
     watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
 
     def __init__(self):
-        self.polls = 0
-        self.request = self._create_request()
-        self.stats = self._get_stats()
-        self.miner_version = self.stats[0]
-        self.start_time = datetime.now() - timedelta(minutes=int(self.stats[1]))
-        self.up_time = 0
-        self.gpus = self._get_number_of_gpus()
-        self.pools = self.stats[7]
-        self.coins = [self.pools[i][0:3] for i in range(len(self.pools))]
-
         self.api_response_labels = [
             'version',
             'mins_up',
@@ -36,6 +26,16 @@ class Miner(object):
             'current_pools',
             ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
         ]
+
+        self.polls = 0
+        self.request = self._create_request()
+        self._update_stats()
+        self.miner_version = self.stats['version']
+        self.start_time = datetime.now() - timedelta(minutes=int(self.stats['mins_up']))
+        self.up_time = 0
+        self.gpus = self._get_number_of_gpus()
+        self.pools = self.stats['current_pools']
+        self.coins = [self.pools[i][0:3] for i in range(len(self.pools))]
 
         self.gpu_stats = {
             i: {
@@ -65,8 +65,8 @@ class Miner(object):
         return json.dumps(request)
 
     def _get_number_of_gpus(self):
-        if isinstance(self.stats[3], list):
-            return len(self.stats[3])
+        if isinstance(self.stats['gpu_hashrate_mhs'], list):
+            return len(self.stats['gpu_hashrate_mhs'])
         else:
             return 1
 
@@ -88,6 +88,27 @@ class Miner(object):
 
         return thing
 
+    def _parse_stats(self):
+        for i in range(len(self.stats)):
+            if ';' in self.stats[i]:
+                self.stats[i] = self.stats[i].split(';')
+                for j in range(len(self.stats[i])):
+                    self.stats[i][j] = self._convert_to_int(self.stats[i][j])
+            else:
+                self.stats[i] = self._convert_to_int(self.stats[i])
+
+    def _zip_stats(self):
+        zipped_stats = {}
+
+        for stat in zip(self.api_response_labels, self.stats):
+            if isinstance(stat[0], list):
+                for i in range(len(stat[0])):
+                    zipped_stats[stat[0][i]] = stat[1][i]
+            else:
+                zipped_stats[stat[0]] = stat[1]
+
+        self.stats = zipped_stats
+
     def _get_stats(self):
         self._create_client()
         self.client.send(self.request.encode('ascii'))
@@ -96,41 +117,17 @@ class Miner(object):
         stats = json.loads(response.decode('ascii'))
 
         if not stats['error']:
-            return self._parse_stats(stats['result'])
+            self.stats = stats['result']
         else:
             print('could not get stats due to error {}'.format(stats['error']))
             return None
 
-    def _parse_stats(self, stats):
-        for i in range(len(stats)):
-            if ';' in stats[i]:
-                stats[i] = stats[i].split(';')
-                for j in range(len(stats[i])):
-                    stats[i][j] = self._convert_to_int(stats[i][j])
-            else:
-                stats[i] = self._convert_to_int(stats[i])
-
-        return stats
-
-    def _zip_stats(self, stats):
-        zipped_stats = {}
-
-        for stat in zip(self.api_response_labels, stats):
-            if isinstance(stat[0], list):
-                for i in range(len(stat[0])):
-                    zipped_stats[stat[0][i]] = stat[1][i]
-            else:
-                zipped_stats[stat[0]] = stat[1]
-
-        return zipped_stats
-
-    def update_stats(self):
-        self.stats = self._zip_stats(self._get_stats())
+    def _update_stats(self):
+        self._get_stats()
+        self._parse_stats()
+        self._zip_stats()
 
 
 if __name__ == '__main__':
     miner = Miner()
-    miner.update_stats()
-
-    for key in miner.stats.keys():
-        print('{}: {}'.format(key, miner.stats[key]))
+    print(miner.stats)
