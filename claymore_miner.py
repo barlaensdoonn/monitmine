@@ -5,8 +5,8 @@
 
 import sys
 import json
-import socket
 import minor
+import socket
 from datetime import datetime, timedelta
 
 
@@ -14,6 +14,7 @@ class Miner(object):
     '''interact with the Claymore miner api'''
 
     watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
+    request = {'method': 'miner_getstat1', 'jsonrpc': '2.0', 'id': 0}
 
     api_response_labels = [
         'version',
@@ -28,7 +29,6 @@ class Miner(object):
     ]
 
     def __init__(self):
-
         self.polls = 0
         self.request = self._create_request()
         self._update_stats()
@@ -62,9 +62,7 @@ class Miner(object):
         }
 
     def _create_request(self):
-        request = {'method': 'miner_getstat1', 'jsonrpc': '2.0', 'id': 0}
-
-        return json.dumps(request)
+        return json.dumps(self.request)
 
     def _get_number_of_gpus(self):
         if isinstance(self.stats['gpu_hashrate_mhs'], list):
