@@ -1,11 +1,13 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 6/29/17
+# updated 7/09/17
 
-
+import yaml
 import minor
 import requests
+import logging
+import logging.config
 
 
 class Coin(object):
@@ -96,7 +98,20 @@ class Coin(object):
         }
 
 
+def initialize_logger():
+    with open(minor.log_conf, 'r') as log_conf:
+        log_config = yaml.safe_load(log_conf)
+
+    logging.config.dictConfig(log_config)
+    logger = logging.getLogger('coin')
+    logger.info('* * * * * * * * * * * * * * * * * * * *')
+    logger.info('coin logger instantiated')
+
+    return logger
+
+
 if __name__ == '__main__':
+    logger = initialize_logger()
     stat_order = ['balance', 'paid', 'total', 'total_btc', 'total_usd', 'price']
     coins = [key for key in minor.addresses.keys()]
     total_usd = 0
@@ -109,14 +124,14 @@ if __name__ == '__main__':
         total_usd += altcoin.info['total_usd']
         total_btc += altcoin.info['total_btc']
 
-        print(' - - - {} - - - '.format(currency.upper()))
+        logger.info(' - - - {} - - - '.format(currency.upper()))
 
         for key in stat_order:
-            print('{}: {:.6f}'.format(key, altcoin.info[key]))
+            logger.info('{}: {:.6f}'.format(key, altcoin.info[key]))
 
-        print(' - - - - - - - - \n')
+        logger.info(' - - - - - - - - ')
 
-    print(' - - - TOTAL - - - ')
-    print('total_usd: {:.6f}'.format(total_usd))
-    print('total_btc: {:.6f}'.format(total_btc))
-    print(' - - - - - - - - \n')
+    logger.info(' - - - TOTAL - - - ')
+    logger.info('total_usd: {:.6f}'.format(total_usd))
+    logger.info('total_btc: {:.6f}'.format(total_btc))
+    logger.info(' - - - - - - - - ')
