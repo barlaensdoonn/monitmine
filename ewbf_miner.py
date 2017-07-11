@@ -1,13 +1,14 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 7/04/17
+# updated 7/09/17
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
-# NOTE: to properly average values this script should be launched right after miner starts and preferably right after % 30 seconds == 0
+# NOTE: to properly average values this script should be launched shortly after miner starts
 
 import sys
 import minor
+import logging
 import requests
 from datetime import datetime
 
@@ -22,6 +23,7 @@ class Miner(object):
     coin = 'zec'
 
     def __init__(self):
+        self._initialize_logger()
         self.polls = 0
         self.stats = self._get_stats()
         self.start_time = datetime.fromtimestamp(self.stats['result'][0]['start_time'])
@@ -54,6 +56,12 @@ class Miner(object):
             'kWhs': {'consumed': 0, 'cost': 0}
         }
 
+    def _initialize_logger(self):
+        self.logger = logging.getLogger('ewbf')
+        self.logger.info('* * * * * * * * * * * * * * * * * * * *')
+        self.logger.info('ewbf logger instantiated')
+        self.logger.info('monitoring session started')
+
     def _get_stats(self):
         retries = 5
 
@@ -62,11 +70,11 @@ class Miner(object):
                 r = requests.get(self.miner_url)
                 return r.json()
             except Exception as e:
-                print('\ncould not connect to miner for the following reason:\n')
-                print(e)
+                self.logger.error('could not connect to miner for the following reason:')
+                self.logger.exception("message")
                 retries -= 1
 
-        print('connect retries exhausted, exiting...')
+        self.logger.error('connect retries exhausted, exiting...')
         sys.exit()
 
     def _get_up_time(self):
@@ -113,38 +121,30 @@ class Miner(object):
             if stat in self.cumulative or stat in self.not_cumulative:
                 self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
-    def _print_stats(self):
-        print('- - - - - - - - - - - - - - - - - -')
-        print('start time: {}'.format(self.start_time))
-        print('time up: {}'.format(self.up_time))
-
-        print()
+    def _log_stats(self):
+        self.logger.info('- - - - - - - - - - - - - - - - - -')
+        self.logger.info('start time: {}'.format(self.start_time))
+        self.logger.info('time up: {}'.format(self.up_time))
 
         for stat in self.cumulative:
             for gpu in self.gpu_stats:
-                print('average {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
+                self.logger.info('average {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['average']))
 
         for stat in self.not_cumulative:
             for gpu in self.gpu_stats:
-                print('total {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['total']))
-
-        print()
+                self.logger.info('total {} gpu{}: {}'.format(stat, gpu, self.gpu_stats[gpu][stat]['total']))
 
         for gpu in self.gpu_stats:
-            print('shares per min gpu{}: {}'.format(gpu, self.gpu_stats[gpu]['shares_per_min']))
-
-        print()
+            self.logger.info('shares per min gpu{}: {}'.format(gpu, self.gpu_stats[gpu]['shares_per_min']))
 
         for stat in self.session_stats:
             if stat in self.cumulative:
-                print('session average {}: {}'.format(stat, self.session_stats[stat]['average']))
+                self.logger.info('session average {}: {}'.format(stat, self.session_stats[stat]['average']))
             elif stat in self.not_cumulative:
-                print('session total {}: {}'.format(stat, self.session_stats[stat]['total']))
+                self.logger.info('session total {}: {}'.format(stat, self.session_stats[stat]['total']))
             else:
                 for nested_stat in self.session_stats[stat]:
-                    print('session {} {}: {}'.format(stat, nested_stat, self.session_stats[stat][nested_stat]))
-
-        print('- - - - - - - - - - - - - - - - - -\n')
+                    self.logger.info('session {} {}: {}'.format(stat, nested_stat, self.session_stats[stat][nested_stat]))
 
     def get_kwhs_consumed(self):
         self.session_stats['kWhs']['consumed'] = (self.watts[self.gpus] / 1000) * (self.up_time.total_seconds() / 60 / 60)
@@ -154,4 +154,4 @@ class Miner(object):
         self.polls += 1
         self._get_up_time()
         self._update_stats()
-        self._print_stats()
+        self._log_stats()
