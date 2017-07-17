@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 7/09/17
+# updated 7/16/17
 
 import yaml
 import time
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     claymore_miner = claymore_miner.Miner()
     ewbf_miner = ewbf_miner.Miner()
     ewbf_coin = coin.Coin(ewbf_miner.coin)
-    ewbf_earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
+    zec_earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
 
     polling = True
 
@@ -32,12 +32,13 @@ if __name__ == '__main__':
         while polling:
             if int(datetime.now().timestamp() % 30) == 0:
                 ewbf_miner.poll()
-                ewbf_earnings.update()
+                zec_earnings.update()
                 time.sleep(1)
 
     except KeyboardInterrupt:
         claymore_miner.logger.info('...user exit received...')
-        ewbf_earnings.logger.info('...user exit received...')
+        ewbf_miner.logger.info('...user exit received...')
+        zec_earnings.logger.info('...user exit received...')
         logging.info('...user exit received...')
         logging.info('exiting...')
         polling = False
