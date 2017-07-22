@@ -15,9 +15,9 @@ class Coin(object):
 
     addresses = minor.addresses
 
-    def __init__(self, coin):
-        self.coin = coin[0:3]
-        self.address = self.addresses[coin]
+    def __init__(self, key):
+        self.currency = key[0:3]
+        self.address = self.addresses[key]
         self.balance = 0
         self.payments = {}
         self.paid = 0
@@ -32,9 +32,9 @@ class Coin(object):
 
     def _construct_url(self, action):
         if action == 'prices':
-            return 'https://api.nanopool.org/v1/{coin}/{action}'.format(coin=self.coin, action=action)
+            return 'https://api.nanopool.org/v1/{currency}/{action}'.format(currency=self.currency, action=action)
         else:
-            return 'https://api.nanopool.org/v1/{coin}/{action}/{acct}'.format(coin=self.coin, action=action, acct=self.address)
+            return 'https://api.nanopool.org/v1/{currency}/{action}/{acct}'.format(currency=self.currency, action=action, acct=self.address)
 
     def _request(self, action):
         url = self._construct_url(action)

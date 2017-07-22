@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
-# mining monitor
+# mining earnings monitor
 # 6/24/17
-# updated 7/09/17
+# updated 7/21/17
 
 import logging
 from datetime import datetime
@@ -17,7 +17,7 @@ class Earnings(object):
     def __init__(self, coin, miner):
         self._initialize_logger()
         self.coin = coin
-        self.currency = coin.coin
+        self.currency = coin.currency
         self.miner = miner
         self.late_launch = False
         self.recalculate = False
