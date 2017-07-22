@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 7/09/17
+# updated 7/21/17
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
 # NOTE: to properly average values this script should be launched shortly after miner starts
@@ -53,7 +53,8 @@ class Miner(object):
             'speed_sps': {'total': 0, 'average': 0},
             'accepted_shares': {'total': 0, 'average': 0},
             'rejected_shares': {'total': 0, 'average': 0},
-            'kWhs': {'consumed': 0, 'cost': 0}
+            'kWhs': {'consumed': 0, 'cost': 0},
+            'shares_per_min': 0
         }
 
     def _initialize_logger(self):
@@ -80,16 +81,16 @@ class Miner(object):
     def _get_up_time(self):
         self.up_time = datetime.now() - self.start_time
 
-    def _get_shares_per_min(self, gpu):
+    def _get_shares_per_min(self, stats_dict):
             up_time_mins = self.up_time.total_seconds() / 60
-            self.gpu_stats[gpu]['shares_per_min'] = self.gpu_stats[gpu]['accepted_shares']['total'] / up_time_mins
+            stats_dict['shares_per_min'] = stats_dict['accepted_shares']['total'] / up_time_mins
 
     def _update_stats(self):
         self.stats = self._get_stats()
 
         for gpu in range(self.gpus):
             self._update_gpu_stats(gpu)
-            self._get_shares_per_min(gpu)
+            self._get_shares_per_min(self.gpu_stats[gpu])
 
         self._update_session_stats()
         self.get_kwhs_consumed()
@@ -121,6 +122,8 @@ class Miner(object):
             if stat in self.cumulative or stat in self.not_cumulative:
                 self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
+        self._get_shares_per_min(self.session_stats)
+
     def _log_stats(self):
         self.logger.info('- - - - - - - - - - - - - - - - - -')
         self.logger.info('start time: {}'.format(self.start_time))
@@ -142,6 +145,8 @@ class Miner(object):
                 self.logger.info('session average {}: {}'.format(stat, self.session_stats[stat]['average']))
             elif stat in self.not_cumulative:
                 self.logger.info('session total {}: {}'.format(stat, self.session_stats[stat]['total']))
+            elif stat == 'shares_per_min':
+                self.logger.info('shares per min session: {}'.format(self.session_stats[stat]))
             else:
                 for nested_stat in self.session_stats[stat]:
                     self.logger.info('session {} {}: {}'.format(stat, nested_stat, self.session_stats[stat][nested_stat]))
