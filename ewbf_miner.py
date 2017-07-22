@@ -85,16 +85,6 @@ class Miner(object):
             up_time_mins = self.up_time.total_seconds() / 60
             stats_dict['shares_per_min'] = stats_dict['accepted_shares']['total'] / up_time_mins
 
-    def _update_stats(self):
-        self.stats = self._get_stats()
-
-        for gpu in range(self.gpus):
-            self._update_gpu_stats(gpu)
-            self._get_shares_per_min(self.gpu_stats[gpu])
-
-        self._update_session_stats()
-        self.get_kwhs_consumed()
-
     def _update_gpu_stats(self, gpu):
         for stat in self.cumulative:
             current_stat = self.stats['result'][gpu][stat]
@@ -123,6 +113,16 @@ class Miner(object):
                 self.session_stats[stat]['average'] = self.session_stats[stat]['total'] / self.polls
 
         self._get_shares_per_min(self.session_stats)
+
+    def _update_stats(self):
+        self.stats = self._get_stats()
+
+        for gpu in range(self.gpus):
+            self._update_gpu_stats(gpu)
+            self._get_shares_per_min(self.gpu_stats[gpu])
+
+        self._update_session_stats()
+        self.get_kwhs_consumed()
 
     def _log_stats(self):
         self.logger.info('- - - - - - - - - - - - - - - - - -')
