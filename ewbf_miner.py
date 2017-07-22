@@ -19,7 +19,7 @@ class Miner(object):
     miner_url = minor.ewbf_url
     cumulative = ['temperature', 'speed_sps']  # leaving out 'gpu_power_usage' since it's pretty much static
     not_cumulative = ['accepted_shares', 'rejected_shares']
-    watts = {1: 300, 2: 600}  # rough watts pulled by system mining with 1 & 2 gpus
+    watts = {1: 295, 2: 590}  # rough watts pulled by system mining with 1 & 2 gpus
     coin = 'zec'
 
     def __init__(self):
