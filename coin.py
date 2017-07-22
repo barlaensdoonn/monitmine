@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 7/09/17
+# updated 7/21/17
 
 import yaml
 import minor
@@ -16,7 +16,7 @@ class Coin(object):
     addresses = minor.addresses
 
     def __init__(self, coin):
-        self.coin = coin
+        self.coin = coin[0:3]
         self.address = self.addresses[coin]
         self.balance = 0
         self.payments = {}
