@@ -55,12 +55,8 @@ class Coin(object):
         return pymnts
 
     def _get_total(self):
-        if self.key == 'dcr':
-            self.balance = dcrd.get_balance()
-            self.paid = dcrd.get_paid_from_txs()
-        else:
-            self.get_balance()
-            self.get_payments()
+        self.get_balance()
+        self.get_payments()
 
         self.total = self.balance + self.paid
 
@@ -74,15 +70,21 @@ class Coin(object):
         self.usd = self.total * self.prices['usd']
 
     def get_balance(self):
-        return self._request('balance')
+        if self.key == 'dcr':
+            return dcrd.get_balance()
+        else:
+            return self._request('balance')
 
     def get_payments(self):
-        self.payments = self._request('payments')
+        if self.key == 'dcr':
+            self.paid = dcrd.get_paid_from_txs()
+        else:
+            self.payments = self._request('payments')
 
-        for payment in self.payments:
-            self.paid += payment['amount']
+            for payment in self.payments:
+                self.paid += payment['amount']
 
-        return self.payments
+            return self.payments
 
     def get_last_payment(self):
         self.get_payments()
