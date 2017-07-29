@@ -75,18 +75,15 @@ class Coin(object):
 
     def get_balance(self):
         amount = self._request('balance')
-
-        if amount:
-            self.balance = amount
+        self.balance = amount
 
         return self.balance
 
     def get_payments(self):
         self.payments = self._request('payments')
 
-        if self.payments:
-            for payment in self.payments:
-                self.paid += payment['amount']
+        for payment in self.payments:
+            self.paid += payment['amount']
 
         return self.payments
 
