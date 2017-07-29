@@ -3,6 +3,7 @@
 # 7/22/17
 # updated 7/28/17
 
+import bttrx
 import minor
 import requests
 
@@ -12,20 +13,16 @@ crrncys = ['btc', 'eth', 'zec', 'dcr', 'sia']
 xchngs = ['usdt', 'btc']
 
 
-def _construct_url(*args):
-    if args[0] in actions:
-        return 'https://dcr.suprnova.cc/index.php?page=api&action={}&api_key={}'.format(args[0], minor.suprnova_key)
-    else:
-        return 'https://bittrex.com/api/v1.1/public/getticker?market={}-{}'.format(args[0].upper(), args[1].upper())
+def _construct_url(action):
+    return 'https://dcr.suprnova.cc/index.php?page=api&action={}&api_key={}'.format(action, minor.suprnova_key)
 
 
-def get_price(xchng, crrncy):
-    if crrncy.lower() == 'sia':
-        crrncy = 'sc'
+def get_prices():
+    btc_dcrd = bttrx.get_price('btc', 'dcr')
+    usd_btc = bttrx.get_price('usdt', 'btc')
+    usd_dcrd = btc_dcrd * usd_btc
 
-    r = requests.get(_construct_url(xchng, crrncy))
-
-    return r.json()['result']['Last']
+    return {'price_btc': btc_dcrd, 'price_usd': usd_dcrd}
 
 
 def get_balance():
