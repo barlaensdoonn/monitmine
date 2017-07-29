@@ -1,10 +1,11 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 7/21/17
+# updated 7/28/17
 
 import yaml
 import minor
+import pickle
 import requests
 import logging
 import logging.config
@@ -16,8 +17,9 @@ class Coin(object):
     addresses = minor.addresses
 
     def __init__(self, key):
-        self.currency = key[0:3]
-        self.address = self.addresses[key]
+        self.key = key
+        self.currency = self.key[0:3]
+        self.address = self.addresses[self.key]
         self.balance = 0
         self.payments = {}
         self.paid = 0
@@ -45,10 +47,19 @@ class Coin(object):
         else:
             return None
 
+    def _get_lew(self):
+        with open(minor.lew_pymnts, 'rb') as pckl:
+            pymnts = pickle.load(pckl)
+
+        return pymnts
+
     def _get_total(self):
         self.get_balance()
         self.get_payments()
         self.total = self.balance + self.paid
+
+        if self.key == 'zec':
+            self.total -= self._get_lew()
 
     def _convert_to_prices(self):
         self.get_prices()
