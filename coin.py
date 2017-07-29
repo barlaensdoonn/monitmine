@@ -74,10 +74,7 @@ class Coin(object):
         self.usd = self.total * self.prices['usd']
 
     def get_balance(self):
-        amount = self._request('balance')
-        self.balance = amount
-
-        return self.balance
+        return self._request('balance')
 
     def get_payments(self):
         self.payments = self._request('payments')
