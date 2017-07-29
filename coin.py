@@ -4,6 +4,7 @@
 # updated 7/28/17
 
 import yaml
+import dcrd
 import minor
 import pickle
 import requests
@@ -54,8 +55,13 @@ class Coin(object):
         return pymnts
 
     def _get_total(self):
-        self.get_balance()
-        self.get_payments()
+        if self.key == 'dcr':
+            self.balance = dcrd.get_balance()
+            self.paid = dcrd.get_paid_from_txs()
+        else:
+            self.get_balance()
+            self.get_payments()
+
         self.total = self.balance + self.paid
 
         if self.key == 'zec':
@@ -90,7 +96,10 @@ class Coin(object):
         return self.payments[0]
 
     def get_prices(self):
-        prices = self._request('prices')
+        if self.key == 'dcr':
+            prices = dcrd.get_prices()
+        else:
+            prices = self._request('prices')
 
         self.prices['btc'] = prices['price_btc']
         self.prices['usd'] = prices['price_usd']
