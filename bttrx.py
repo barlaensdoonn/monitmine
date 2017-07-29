@@ -11,8 +11,8 @@ def _construct_url(*args):
 
 
 def get_price(xchng, crrncy):
-    if crrncy.lower() == 'sia':
-        crrncy = 'sc'
+    # if crrncy.lower() == 'sia':
+    #     crrncy = 'sc'
 
     r = requests.get(_construct_url(xchng, crrncy))
 
