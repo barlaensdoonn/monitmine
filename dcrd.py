@@ -9,8 +9,6 @@ import requests
 
 # NOTE: getusertransactions only returns last 100 transactions
 actions = ['getuserstatus', 'getuserbalance', 'getdashboarddata', 'getusertransactions', 'getuserhashrate']
-crrncys = ['btc', 'eth', 'zec', 'dcr', 'sia']
-xchngs = ['usdt', 'btc']
 
 
 def _construct_url(action):
@@ -46,8 +44,3 @@ def get_paid_from_txs():
     # credit = summary['Credit']
 
     return paid
-
-
-if __name__ == '__main__':
-    total = get_balance() + get_paid_from_txs()
-    print(total)
