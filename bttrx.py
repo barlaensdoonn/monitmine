@@ -5,6 +5,9 @@
 
 import requests
 
+xchngs = ['usdt', 'btc']
+crrncys = ['btc', 'eth', 'zec', 'dcr', 'sia']
+
 
 def _construct_url(*args):
     return 'https://bittrex.com/api/v1.1/public/getticker?market={}-{}'.format(args[0].upper(), args[1].upper())
