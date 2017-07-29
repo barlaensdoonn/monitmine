@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 7/16/17
+# updated 7/29/17
 
 import yaml
 import time
@@ -41,4 +41,3 @@ if __name__ == '__main__':
         zec_earnings.logger.info('...user exit received...')
         logging.info('...user exit received...')
         logging.info('exiting...')
-        polling = False
