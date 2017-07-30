@@ -48,6 +48,8 @@ class Coin(object):
     def get_payments(self):
         self.payments = self.interface.get_payments()
 
+        return self.payments
+
     def get_last_payment(self):
         self.get_payments()
 
