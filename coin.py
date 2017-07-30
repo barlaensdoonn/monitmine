@@ -1,10 +1,10 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 7/28/17
+# updated 7/29/17
 
 import yaml
-import dcrd_modular as dcrd
+import dcrd
 import nnpl
 import minor
 import logging
