@@ -35,7 +35,8 @@ class Miner(object):
         self.request = json.dumps(self.request)
         self._update_stats()
         self.miner_version = self.stats['version']
-        self.start_time = datetime.now() - timedelta(minutes=int(self.stats['mins_up']))
+        self.mins_up = int(self.stats['mins_up'])
+        self.start_time = datetime.now() - timedelta(minutes=self.mins_up)
         self.up_time = 0
         self.gpus = self._get_number_of_gpus()
         self.pools = self.stats['current_pools']
@@ -51,7 +52,9 @@ class Miner(object):
         }
 
         self.session_stats = {
-            'temperature': {'total': 0, 'average': 0},
+            # NOTE: other available stats: ['num_invalid_shares', num_invalid_shares_alt', 'num_pool_switches', 'num_pool_switches_alt']
+            'gpu_temp': {'total': 0, 'average': 0},
+            'gpu_fan_speed': {'total': 0, 'average': 0},
             'hashrate_mhs': {'total': 0, 'average': 0},
             'hashrate_mhs_alt': {'total': 0, 'average': 0},
             'accepted_shares': {'total': 0, 'average': 0},
@@ -148,4 +151,5 @@ class Miner(object):
 
 if __name__ == '__main__':
     miner = Miner()
-    print(miner.stats)
+    for key in miner.stats.keys():
+        print('{}: {}'.format(key, miner.stats[key]))
