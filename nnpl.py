@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # eth, sia, zec via nanopool api
 # 7/29/17
-# updated 7/29/17
+# updated 7/30/17
 
 import minor
 import pickle
@@ -36,10 +36,15 @@ class Nnpl(object):
             pymnt['date'] = datetime.fromtimestamp(pymnt['date'])
 
     def get_lew(self):
-        with open(minor.lew_pymnts, 'rb') as pckl:
-            pymnts = pickle.load(pckl)
+        lews_cut = 500 / 715 / 2
+        balance = self.get_balance()
+        lew_paid = lews_cut * balance
 
-        return pymnts
+        with open(minor.lew_pymnts, 'rb') as pckl:
+            lew = pickle.load(pckl)
+
+        lew_paid += lew
+        return lew_paid
 
     def get_balance(self):
         return self._request('balance')
