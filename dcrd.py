@@ -27,11 +27,11 @@ def _request(action):
 def _convert_to_datetime(pymnt_lst):
     '''timestamps from suprnova seem to be 9 hours ahead'''
 
-    for pymnt in pymnt_lst:
-        pymnt['date'] = datetime.strptime(pymnt['timestamp'], '%Y-%m-%d %H:%M:%S')
-        pymnt['date'] = pymnt['date'] - timedelta(hours=9)
+    for i in range(len(pymnt_lst)):
+        pymnt_lst[i]['date'] = datetime.strptime(pymnt_lst[i]['timestamp'], '%Y-%m-%d %H:%M:%S')
+        pymnt_lst[i]['date'] = pymnt_lst[i]['date'] - timedelta(hours=9)
 
-        return pymnt_lst
+    return pymnt_lst
 
 
 def get_prices():
