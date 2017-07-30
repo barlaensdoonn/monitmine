@@ -4,10 +4,9 @@
 # updated 7/28/17
 
 import yaml
-import dcrd
+import dcrd_modular as dcrd
+import nnpl
 import minor
-import pickle
-import requests
 import logging
 import logging.config
 
@@ -15,12 +14,10 @@ import logging.config
 class Coin(object):
     '''basic functions to interact with nanopool api'''
 
-    addresses = minor.addresses
-
-    def __init__(self, key):
+    def __init__(self, key, interface):
         self.key = key
         self.currency = self.key[0:3]
-        self.address = self.addresses[self.key]
+        self.interface = interface
         self.balance = 0
         self.payments = {}
         self.paid = 0
@@ -33,35 +30,14 @@ class Coin(object):
             'usd': 0
         }
 
-    def _construct_url(self, action):
-        if action == 'prices':
-            return 'https://api.nanopool.org/v1/{currency}/{action}'.format(currency=self.currency, action=action)
-        else:
-            return 'https://api.nanopool.org/v1/{currency}/{action}/{acct}'.format(currency=self.currency, action=action, acct=self.address)
-
-    def _request(self, action):
-        url = self._construct_url(action)
-        r = requests.get(url)
-
-        if r.status_code == 200:
-            return r.json()['data']
-        else:
-            return None
-
-    def _get_lew(self):
-        with open(minor.lew_pymnts, 'rb') as pckl:
-            pymnts = pickle.load(pckl)
-
-        return pymnts
-
     def _get_total(self):
-        self.get_balance()
-        self.get_payments()
+        self.balance = self.interface.get_balance()
+        self.paid = self.interface.get_paid()
 
         self.total = self.balance + self.paid
 
         if self.key == 'zec':
-            self.total -= self._get_lew()
+            self.total -= self.interface.get_lew()
 
     def _convert_to_prices(self):
         self.get_prices()
@@ -69,22 +45,8 @@ class Coin(object):
         self.btc = self.total * self.prices['btc']
         self.usd = self.total * self.prices['usd']
 
-    def get_balance(self):
-        if self.key == 'dcr':
-            return dcrd.get_balance()
-        else:
-            return self._request('balance')
-
     def get_payments(self):
-        if self.key == 'dcr':
-            self.paid = dcrd.get_paid_from_txs()
-        else:
-            self.payments = self._request('payments')
-
-            for payment in self.payments:
-                self.paid += payment['amount']
-
-            return self.payments
+        self.payments = self.interface.get_payments()
 
     def get_last_payment(self):
         self.get_payments()
@@ -92,10 +54,7 @@ class Coin(object):
         return self.payments[0]
 
     def get_prices(self):
-        if self.key == 'dcr':
-            prices = dcrd.get_prices()
-        else:
-            prices = self._request('prices')
+        prices = self.interface.get_prices()
 
         self.prices['btc'] = prices['price_btc']
         self.prices['usd'] = prices['price_usd']
@@ -134,7 +93,12 @@ if __name__ == '__main__':
     total_btc = 0
 
     for currency in coins:
-        altcoin = Coin(currency)
+        if currency == 'dcr':
+            api = dcrd.Dcrd()
+        else:
+            api = nnpl.Nnpl(currency)
+
+        altcoin = Coin(currency, api)
         altcoin.update()
 
         total_usd += altcoin.info['total_usd']
