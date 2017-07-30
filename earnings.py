@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining earnings monitor
 # 6/24/17
-# updated 7/29/17
+# updated 7/30/17
 
 import logging
 from datetime import datetime
@@ -137,7 +137,6 @@ class Earnings(object):
         self.logger.info('{} earnings updated at {}'.format(self.currency.upper(), datetime.now()))
 
         for key in self.earnings:
-            self.logger.info('')
             self.logger.info('- - - - - - - - {} - - - - - - - - - '.format(key))
             for thing in self.log_order:
                 self.logger.info('{}: {}'.format(thing, self.earnings[key][thing]))
