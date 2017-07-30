@@ -53,7 +53,7 @@ class Miner(object):
 
         self.session_stats = {
             # NOTE: other available stats: ['num_invalid_shares', num_invalid_shares_alt', 'num_pool_switches', 'num_pool_switches_alt']
-            'gpu_temp': {'total': 0, 'average': 0},
+            'gpu_temperature': {'total': 0, 'average': 0},
             'gpu_fan_speed': {'total': 0, 'average': 0},
             'hashrate_mhs': {'total': 0, 'average': 0},
             'hashrate_mhs_alt': {'total': 0, 'average': 0},
