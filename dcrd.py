@@ -28,8 +28,8 @@ def _convert_to_datetime(pymnt_lst):
     '''timestamps from suprnova seem to be 9 hours ahead'''
 
     for pymnt in pymnt_lst:
-        pymnt['timestamp'] = datetime.strptime(pymnt['timestamp'], '%Y-%m-%d %H:%M:%S')
-        pymnt['date'] = pymnt['timestamp'] - timedelta(hours=9)
+        pymnt['date'] = datetime.strptime(pymnt['timestamp'], '%Y-%m-%d %H:%M:%S')
+        pymnt['date'] = pymnt['date'] - timedelta(hours=9)
 
         return pymnt_lst
 
