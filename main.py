@@ -9,6 +9,7 @@ import logging
 import logging.config
 from datetime import datetime
 import coin
+import nnpl
 import minor
 import earnings
 import ewbf_miner
@@ -23,7 +24,7 @@ if __name__ == '__main__':
 
     claymore_miner = claymore_miner.Miner()
     ewbf_miner = ewbf_miner.Miner()
-    ewbf_coin = coin.Coin(ewbf_miner.coin)
+    ewbf_coin = coin.Coin(ewbf_miner.coin, nnpl.Nnpl(ewbf_miner.coin))
     zec_earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
 
     polling = True
