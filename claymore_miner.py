@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # claymore miner api monitor
 # 7/03/17
-# updated 7/09/17
+# updated 7/30/17
 
 import sys
 import json
@@ -32,7 +32,7 @@ class Miner(object):
     def __init__(self):
         self._initialize_logger()
         self.polls = 0
-        self.request = self._create_request()
+        self.request = json.dumps(self.request)
         self._update_stats()
         self.miner_version = self.stats['version']
         self.start_time = datetime.now() - timedelta(minutes=int(self.stats['mins_up']))
@@ -68,9 +68,6 @@ class Miner(object):
         self.logger.info('* * * * * * * * * * * * * * * * * * * *')
         self.logger.info('claymore logger instantiated')
         self.logger.info('monitoring session started')
-
-    def _create_request(self):
-        return json.dumps(self.request)
 
     def _get_number_of_gpus(self):
         if isinstance(self.stats['gpu_hashrate_mhs'], list):
@@ -137,7 +134,7 @@ class Miner(object):
 
             except Exception as e:
                 self.logger.error('could not connect to miner for the following reason:')
-                print(e)
+                self.logger.error(e)
                 retries -= 1
 
         self.logger.error('connect retries exhausted, exiting...')
