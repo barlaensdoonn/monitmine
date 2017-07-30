@@ -6,6 +6,7 @@
 import minor
 import pickle
 import requests
+from datetime import datetime
 
 
 class Nnpl(object):
@@ -30,6 +31,10 @@ class Nnpl(object):
 
         return r.json()['data']
 
+    def _convert_to_datetime(self):
+        for pymnt in self.payments:
+            pymnt['date'] = datetime.fromtimestamp(pymnt['date'])
+
     def get_lew(self):
         with open(minor.lew_pymnts, 'rb') as pckl:
             pymnts = pickle.load(pckl)
@@ -41,6 +46,7 @@ class Nnpl(object):
 
     def get_payments(self):
         self.payments = self._request('payments')
+        self._convert_to_datetime()
 
         return self.payments
 

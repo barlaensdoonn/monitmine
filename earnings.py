@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining earnings monitor
 # 6/24/17
-# updated 7/21/17
+# updated 7/29/17
 
 import logging
 from datetime import datetime
@@ -73,7 +73,7 @@ class Earnings(object):
         all_payments = self.coin.get_payments()
 
         for payment in all_payments:
-            pay_date = datetime.fromtimestamp(payment['date'])
+            pay_date = payment['date']
 
             if pay_date > self.miner.start_time:
                 self.payments['this_session'].append(payment)
