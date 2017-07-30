@@ -45,6 +45,9 @@ class Coin(object):
         self.btc = self.total * self.prices['btc']
         self.usd = self.total * self.prices['usd']
 
+    def get_balance(self):
+        return self.interface.get_balance()
+
     def get_payments(self):
         self.payments = self.interface.get_payments()
 
