@@ -6,6 +6,7 @@
 import bttrx
 import minor
 import requests
+from datetime import datetime, timedelta
 
 
 # NOTE: getusertransactions only returns last 100 transactions
@@ -21,6 +22,16 @@ def _request(action):
     r = requests.get(_construct_url(action))
 
     return r.json()[action]['data']
+
+
+def _convert_to_datetime(pymnt_lst):
+    '''timestamps from suprnova seem to be 9 hours ahead'''
+
+    for pymnt in pymnt_lst:
+        pymnt['timestamp'] = datetime.strptime(pymnt['timestamp'], '%Y-%m-%d %H:%M:%S')
+        pymnt['date'] = pymnt['timestamp'] - timedelta(hours=9)
+
+        return pymnt_lst
 
 
 def get_prices():
@@ -57,6 +68,7 @@ def get_paid():
 def get_payments():
     # NOTE: all possible tx types: ['Bonus', 'Credit', 'Credit_PPS', 'Debit_AP', 'Debit_MP', 'Fee', 'TXFee']
     # NOTE: all keys in tx instance: ['amount', 'blockhash', 'coin_address', 'confirmations', 'height', 'id', 'timestamp', 'txid', 'type', 'username']
+    # NOTE: string format for tx['date']: '%Y-%m-%d %H:%M:%S' (currently seems to be 9 hours ahead)
 
     pymnt_types = ['Bonus', 'Credit', 'Credit_PPS', 'Debit_AP', 'Debit_MP']
     pymnts = []
@@ -66,4 +78,7 @@ def get_payments():
 
     for i in range(len(txs)):
         if txs[i]['type'] in pymnt_types:
-            pymnts.append(txs[i])
+            tx = {key: txs[i][key] for key in ['amount', 'timestamp', 'id']}
+            pymnts.append(tx)
+
+    return _convert_to_datetime(pymnts)
