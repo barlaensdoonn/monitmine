@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
     for currency in coins:
         if currency == 'dcr':
-            api = dcrd.Dcrd()
+            api = dcrd
         else:
             api = nnpl.Nnpl(currency)
 

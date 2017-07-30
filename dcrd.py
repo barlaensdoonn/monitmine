@@ -8,47 +8,62 @@ import minor
 import requests
 
 
-class Dcrd(object):
-    '''basic functions to interact with suprnova [MPOS] api'''
+# NOTE: getusertransactions only returns last 100 transactions
+actions = ['getuserstatus', 'getuserbalance', 'getdashboarddata', 'getusertransactions', 'getuserhashrate']
+api_key = minor.suprnova_key
 
-    # NOTE: getusertransactions only returns last 100 transactions
-    actions = ['getuserstatus', 'getuserbalance', 'getdashboarddata', 'getusertransactions', 'getuserhashrate']
 
-    def __init__(self):
-        self.api_key = minor.suprnova_key
+def _construct_url(action):
+    return 'https://dcr.suprnova.cc/index.php?page=api&action={}&api_key={}'.format(action, api_key)
 
-    def _construct_url(self, action):
-        return 'https://dcr.suprnova.cc/index.php?page=api&action={}&api_key={}'.format(action, self.api_key)
 
-    def _request(self, action):
-        r = requests.get(self._construct_url(action))
+def _request(action):
+    r = requests.get(_construct_url(action))
 
-        return r.json()[action]['data']
+    return r.json()[action]['data']
 
-    def get_prices(self):
-        btc_dcrd = bttrx.get_price('btc', 'dcr')
-        usd_btc = bttrx.get_price('usdt', 'btc')
-        usd_dcrd = btc_dcrd * usd_btc
 
-        return {'price_btc': btc_dcrd, 'price_usd': usd_dcrd}
+def get_prices():
+    btc_dcrd = bttrx.get_price('btc', 'dcr')
+    usd_btc = bttrx.get_price('usdt', 'btc')
+    usd_dcrd = btc_dcrd * usd_btc
 
-    def get_balance(self):
-        balance = 0
-        r_balance = self._request('getuserbalance')
+    return {'price_btc': btc_dcrd, 'price_usd': usd_dcrd}
 
-        for key in ['confirmed', 'unconfirmed']:
-            balance += r_balance[key]
 
-        return balance
+def get_balance():
+    balance = 0
+    r_balance = _request('getuserbalance')
 
-    def get_paid(self):
-        r_txs = self._request('getusertransactions')
-        summary = r_txs['transactionsummary']
+    for key in ['confirmed', 'unconfirmed']:
+        balance += r_balance[key]
 
-        # NOTE: paid + fees + txfee + balance == credit
-        paid = summary['Debit_AP']
-        # fees = summary['Fee']
-        # txfee = summary['TXFee']
-        # credit = summary['Credit']
+    return balance
 
-        return paid
+
+def get_paid():
+    r_txs = _request('getusertransactions')
+    summary = r_txs['transactionsummary']
+
+    # NOTE: paid + fees + txfee + balance == credit
+    paid = summary['Debit_AP']
+    # fees = summary['Fee']
+    # txfee = summary['TXFee']
+    # credit = summary['Credit']
+
+    return paid
+
+
+def get_payments():
+    # NOTE: all possible tx types: ['Bonus', 'Credit', 'Credit_PPS', 'Debit_AP', 'Debit_MP', 'Fee', 'TXFee']
+    # NOTE: all keys in tx instance: ['amount', 'blockhash', 'coin_address', 'confirmations', 'height', 'id', 'timestamp', 'txid', 'type', 'username']
+
+    pymnt_types = ['Bonus', 'Credit', 'Credit_PPS', 'Debit_AP', 'Debit_MP']
+    pymnts = []
+
+    r_txs = _request('getusertransactions')
+    txs = r_txs['transactions']
+
+    for i in range(len(txs)):
+        if txs[i]['type'] in pymnt_types:
+            pymnts.append(txs[i])
