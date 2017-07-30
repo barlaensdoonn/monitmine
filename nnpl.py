@@ -26,13 +26,9 @@ class Nnpl(object):
             return 'https://api.nanopool.org/v1/{currency}/{action}/{acct}'.format(currency=self.currency, action=action, acct=self.address)
 
     def _request(self, action):
-        url = self._construct_url(action)
-        r = requests.get(url)
+        r = requests.get(self._construct_url(action))
 
-        if r.status_code == 200:
-            return r.json()['data']
-        else:
-            return None
+        return r.json()['data']
 
     def get_lew(self):
         with open(minor.lew_pymnts, 'rb') as pckl:
