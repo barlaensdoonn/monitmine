@@ -133,9 +133,11 @@ class Earnings(object):
         self.recalculate = False
 
     def _log_earnings(self):
+        self.logger.info('')
         self.logger.info('{} earnings updated at {}'.format(self.currency.upper(), datetime.now()))
 
         for key in self.earnings:
+            self.logger.info('')
             self.logger.info('- - - - - - - - {} - - - - - - - - - '.format(key))
             for thing in self.log_order:
                 self.logger.info('{}: {}'.format(thing, self.earnings[key][thing]))
