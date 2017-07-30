@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 7/21/17
+# updated 7/30/17
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
 # NOTE: to properly average values this script should be launched shortly after miner starts
@@ -72,7 +72,7 @@ class Miner(object):
                 return r.json()
             except Exception as e:
                 self.logger.error('could not connect to miner for the following reason:')
-                self.logger.exception("message")
+                self.logger.error(e)
                 retries -= 1
 
         self.logger.error('connect retries exhausted, exiting...')
