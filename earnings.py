@@ -98,7 +98,7 @@ class Earnings(object):
     def _update_payments(self):
         self.payments['most_recent'] = self.coin.get_last_payment()
 
-        if self.payments['most_recent']['txHash'] != self.payments['last']['txHash']:
+        if self.payments['most_recent']['date'] != self.payments['last']['date']:
             self.recalculate = True
             self.payments['this_session'].insert(0, self.payments['most_recent'])
             self.payments['last'] = self.payments['most_recent']
