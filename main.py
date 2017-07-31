@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining monitor
 # 6/24/17
-# updated 7/29/17
+# updated 7/30/17
 
 import yaml
 import time
@@ -22,8 +22,8 @@ if __name__ == '__main__':
 
     logging.config.dictConfig(log_config)
 
-    claymore_miner = claymore_miner.Miner()
-    ewbf_miner = ewbf_miner.Miner()
+    # claymore_miner = claymore_miner.Miner()
+    ewbf_miner = ewbf_miner.Miner(minor.ewbf_barls)
     ewbf_coin = coin.Coin(ewbf_miner.coin, nnpl.Nnpl(ewbf_miner.coin))
     zec_earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
                 time.sleep(1)
 
     except KeyboardInterrupt:
-        claymore_miner.logger.info('...user exit received...')
+        # claymore_miner.logger.info('...user exit received...')
         ewbf_miner.logger.info('...user exit received...')
         zec_earnings.logger.info('...user exit received...')
         logging.info('...user exit received...')

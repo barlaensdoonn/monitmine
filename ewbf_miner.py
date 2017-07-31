@@ -7,7 +7,6 @@
 # NOTE: to properly average values this script should be launched shortly after miner starts
 
 import sys
-import minor
 import logging
 import requests
 from datetime import datetime
@@ -16,14 +15,14 @@ from datetime import datetime
 class Miner(object):
     '''interact with the EWBF miner api'''
 
-    miner_url = minor.ewbf_url
     cumulative = ['temperature', 'speed_sps']  # leaving out 'gpu_power_usage' since it's pretty much static
     not_cumulative = ['accepted_shares', 'rejected_shares']
-    watts = {1: 295, 2: 590}  # rough watts pulled by system mining with 1 & 2 gpus
+    watts = {1: 305, 2: 610}  # rough watts pulled by system mining with 1 & 2 gpus
     coin = 'zec'
 
-    def __init__(self):
+    def __init__(self, url):
         self._initialize_logger()
+        self.url = url
         self.polls = 0
         self.stats = self._get_stats()
         self.start_time = datetime.fromtimestamp(self.stats['result'][0]['start_time'])
@@ -68,7 +67,7 @@ class Miner(object):
 
         while retries:
             try:
-                r = requests.get(self.miner_url)
+                r = requests.get(self.url)
                 return r.json()
             except Exception as e:
                 self.logger.error('could not connect to miner for the following reason:')
