@@ -20,13 +20,13 @@ class Miner(object):
     api_response_labels = [
         'version',
         'mins_up',
-        ['hashrate_mhs', 'accepted_shares', 'rejected_shares'],
+        'hashrate_mhs;accepted_shares;rejected_shares',
         'gpu_hashrate_mhs',
-        ['hashrate_mhs_alt', 'accepted_shares_alt', 'rejected_shares_alt'],
+        'hashrate_mhs_alt;accepted_shares_alt;rejected_shares_alt',
         'gpu_hashrate_mhs_alt',
-        ['gpu_temperature', 'gpu_fan_speed'],
+        'gpu_temperature;gpu_fan_speed',
         'current_pools',
-        ['num_invalid_shares', 'num_pool_switches', 'num_invalid_shares_alt', 'num_pool_switches_alt']
+        'num_invalid_shares;num_pool_switches;num_invalid_shares_alt;num_pool_switches_alt'
     ]
 
     def __init__(self):
@@ -96,7 +96,24 @@ class Miner(object):
 
         return thing
 
-    def _parse_stats(self):
+    def _zip_stats(self):
+        self.stats = {label: stat for (label, stat) in zip(self.api_response_labels, self.stats)}
+
+    def _parse_stat(self):
+        split_stats = {}
+
+        for key in self.stats.keys():
+            if ';' in self.stats[key]:
+                if ';' in key:
+                    key_split = key.split(';')
+                else:
+                    key_split = key
+                value_split = self.stats[key].split(';')
+                print('{}: {}'.format(key_split, value_split))
+            else:
+                print('{}: {}'.format(key, self.stats[key]))
+
+    def _parse_stats_old(self):
         for i in range(len(self.stats)):
             if ';' in self.stats[i]:
                 self.stats[i] = self.stats[i].split(';')
@@ -105,7 +122,7 @@ class Miner(object):
             else:
                 self.stats[i] = self._convert_to_int(self.stats[i])
 
-    def _zip_stats(self):
+    def _zip_stats_old(self):
         zipped_stats = {}
 
         for stat in zip(self.api_response_labels, self.stats):
