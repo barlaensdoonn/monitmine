@@ -162,8 +162,8 @@ class Miner(object):
 
     def _update_stats(self):
         self._get_stats()
-        self._parse_stats()
         self._zip_stats()
+        self._parse_stats()
 
 
 if __name__ == '__main__':
