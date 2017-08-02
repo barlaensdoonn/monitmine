@@ -20,9 +20,10 @@ class Miner(object):
     watts = {1: 305, 2: 610}  # rough watts pulled by system mining with 1 & 2 gpus
     coin = 'zec'
 
-    def __init__(self, url):
+    def __init__(self, url, name):
         self._initialize_logger()
         self.url = url
+        self.name = name
         self.polls = 0
         self.stats = self._get_stats()
         self.start_time = datetime.fromtimestamp(self.stats['result'][0]['start_time'])
@@ -124,7 +125,7 @@ class Miner(object):
         self.get_kwhs_consumed()
 
     def _log_stats(self):
-        self.logger.info('- - - - - - - - - - - - - - - - - -')
+        self.logger.info('<> <> <> <> <> {} <> <> <> <> <>'.format(self.name))
         self.logger.info('start time: {}'.format(self.start_time))
         self.logger.info('time up: {}'.format(self.up_time))
 

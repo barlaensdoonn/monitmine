@@ -23,22 +23,24 @@ if __name__ == '__main__':
     logging.config.dictConfig(log_config)
 
     # claymore_miner = claymore_miner.Miner()
-    ewbf_miner = ewbf_miner.Miner(minor.ewbf_barls)
-    ewbf_coin = coin.Coin(ewbf_miner.coin, nnpl.Nnpl(ewbf_miner.coin))
-    zec_earnings = earnings.Earnings(ewbf_coin, ewbf_miner)
+    ewbf_main = ewbf_miner.Miner(minor.ewbf_main, minor.ewbf_main_name)
+    ewbf_xtra = ewbf_miner.Miner(minor.ewbf_xtra, minor.ewbf_xtra_name)
+    ewbf_coin = coin.Coin(ewbf_main.coin, nnpl.Nnpl(ewbf_main.coin))
+    zec_earnings = earnings.Earnings(ewbf_coin, ewbf_main)
 
     polling = True
 
     try:
         while polling:
             if int(datetime.now().timestamp() % 30) == 0:
-                ewbf_miner.poll()
+                ewbf_main.poll()
+                ewbf_xtra.poll()
                 zec_earnings.update()
                 time.sleep(1)
 
     except KeyboardInterrupt:
         # claymore_miner.logger.info('...user exit received...')
-        ewbf_miner.logger.info('...user exit received...')
+        ewbf_main.logger.info('...user exit received...')
         zec_earnings.logger.info('...user exit received...')
         logging.info('...user exit received...')
         logging.info('exiting...')
