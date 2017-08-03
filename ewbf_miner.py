@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # ewbf zec miner api monitor
 # 6/22/17
-# updated 7/30/17
+# updated 8/3/17
 
 # NOTE: temp, gpu_power_usage, speed_sps updated by api every 30 seconds
 # NOTE: to properly average values this script should be launched shortly after miner starts
@@ -56,6 +56,8 @@ class Miner(object):
             'kWhs': {'consumed': 0, 'cost': 0},
             'shares_per_min': 0
         }
+
+        self._get_up_time()
 
     def _initialize_logger(self):
         self.logger = logging.getLogger('ewbf')
