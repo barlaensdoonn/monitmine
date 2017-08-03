@@ -19,6 +19,7 @@ import ewbf_miner
 def check_for_miners(maybe_dict):
     '''
     miners dict format:
+
     miners = {
         'name': {
             'url': '',
@@ -79,3 +80,6 @@ if __name__ == '__main__':
                 miners[miner]['miner'].logger.info('...user exit received...')
             zec_earnings.logger.info('...user exit received...')
             logging.info('...user exit received...')
+
+    else:
+        logging.error('could not connect to any miners')
