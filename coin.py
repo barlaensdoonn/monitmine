@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # check coin balances via nanopool api
 # 6/22/17
-# updated 7/29/17
+# updated 8/17/17
 
 import yaml
 import dcrd
@@ -56,7 +56,10 @@ class Coin(object):
     def get_last_payment(self):
         self.get_payments()
 
-        return self.payments[0]
+        if self.payments:
+            return self.payments[0]
+        else:
+            return self.payments  # equal to None if request failed
 
     def get_prices(self):
         prices = self.interface.get_prices()

@@ -48,7 +48,7 @@ def check_for_miners(maybe_dict):
 def get_max(miner_dict):
     up_times = {name: miner_dict[name]['miner'].up_time for name in miner_dict}
 
-    # found here: https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
+    # found max solution here: https://stackoverflow.com/questions/268272/getting-key-with-maximum-value-in-dictionary
     return max(up_times, key=lambda key: up_times[key])
 
 
@@ -80,6 +80,7 @@ if __name__ == '__main__':
                 miners[miner]['miner'].logger.info('...user exit received...')
             zec_earnings.logger.info('...user exit received...')
             logging.info('...user exit received...')
+            polling = False
 
     else:
         logging.error('could not connect to any miners')

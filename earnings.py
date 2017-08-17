@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # mining earnings monitor
 # 6/24/17
-# updated 7/30/17
+# updated 8/17/17
 
 import logging
 from datetime import datetime
@@ -89,19 +89,25 @@ class Earnings(object):
             self.balances['initial'] = self.balances['current']
 
     def _update_balance(self):
-        self.balances['most_recent'] = self.coin.get_balance()
+        balance_check = self.coin.get_balance()
 
-        if self.balances['most_recent'] != self.balances['current']:
-            self.recalculate = True
-            self.balances['current'] = self.balances['most_recent']
+        if balance_check is not None:
+            self.balances['most_recent'] = balance_check
+
+            if self.balances['most_recent'] != self.balances['current']:
+                self.recalculate = True
+                self.balances['current'] = self.balances['most_recent']
 
     def _update_payments(self):
-        self.payments['most_recent'] = self.coin.get_last_payment()
+        payment_check = self.coin.get_last_payment()
 
-        if self.payments['most_recent']['date'] != self.payments['last']['date']:
-            self.recalculate = True
-            self.payments['this_session'].insert(0, self.payments['most_recent'])
-            self.payments['last'] = self.payments['most_recent']
+        if payment_check is not None:
+            self.payments['most_recent'] = payment_check
+
+            if self.payments['most_recent']['date'] != self.payments['last']['date']:
+                self.recalculate = True
+                self.payments['this_session'].insert(0, self.payments['most_recent'])
+                self.payments['last'] = self.payments['most_recent']
 
     def _calculate_rates(self):
         self.earnings['coin']['per_min'] = self.earnings['coin']['session_total'] / self.miner.up_time.total_seconds() * 60
