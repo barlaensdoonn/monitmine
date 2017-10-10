@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 # eth, sia, zec via nanopool api
 # 7/29/17
-# updated 8/17/17
+# updated 10/10/17
 
 import minor
 import pickle
@@ -71,3 +71,6 @@ class Nnpl(object):
 
     def get_prices(self):
         return self._request('prices')
+
+    def get_hashrate(self):
+        return self._request('hashrate')
