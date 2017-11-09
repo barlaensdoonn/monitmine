@@ -27,12 +27,21 @@ class Nnpl(object):
             return 'https://api.nanopool.org/v1/{currency}/{action}/{acct}'.format(currency=self.currency, action=action, acct=self.address)
 
     def _request(self, action):
-        r = requests.get(self._construct_url(action))
+        retries = 5
 
-        if r.status_code == 200:
-            return r.json()['data']
-        else:
-            return None
+        while retries:
+            try:
+                r = requests.get(self._construct_url(action))
+
+                if r.status_code == 200:
+                    return r.json()['data']
+                else:
+                    return None
+            except KeyError:
+                if retries > 1:
+                    logging.warning("KeyError when calling r.json()['data'], retrying request...")
+
+                retries -= 1
 
     def _convert_to_datetime(self):
         for pymnt in self.payments:
