@@ -1,11 +1,12 @@
 #!/usr/local/bin/python3
 # eth, sia, zec via nanopool api
 # 7/29/17
-# updated 10/10/17
+# updated 11/7/17
 
 import minor
 import pickle
 import requests
+import logging
 from datetime import datetime
 
 
