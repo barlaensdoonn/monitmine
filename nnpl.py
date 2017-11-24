@@ -34,13 +34,14 @@ class Nnpl(object):
             try:
                 r = requests.get(self._construct_url(action))
 
-                if r.status_code == 200:
+                if r.json()['status'] is True:
                     return r.json()['data']
                 else:
-                    return None
+                    logging.debug("r.json()['status'] == False for action: {}, key: {}. probably an old account, returning 0")
+                    return 0
             except KeyError:
                 if retries > 1:
-                    logging.warning("KeyError calling r.json()['data']. action: {}, key: {}.\n retrying request...".format(action, self.key.upper()))
+                    logging.error("KeyError calling r.json()['data'] for action: {}, key: {}. retrying request...".format(action, self.key.upper()))
 
                 retries -= 1
 
