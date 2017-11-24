@@ -40,7 +40,7 @@ class Nnpl(object):
                     return None
             except KeyError:
                 if retries > 1:
-                    logging.warning("KeyError when calling r.json()['data'], retrying request...")
+                    logging.warning("KeyError calling r.json()['data']. action: {}, key: {}.\n retrying request...".format(action, self.key.upper()))
 
                 retries -= 1
 
